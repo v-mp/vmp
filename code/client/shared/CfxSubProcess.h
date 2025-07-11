@@ -51,7 +51,7 @@ inline const wchar_t* MakeCfxSubProcess(const std::wstring& processType, const s
 #ifdef IS_LAUNCHER
 	productName = L"CGL_";
 #elif defined(GTA_FIVE)
-	productName = L"FiveM_";
+	productName = L"VMP_";
 #elif defined(IS_FXSERVER)
 	productName = L"FXS_";
 #elif defined(IS_RDR3)
@@ -78,10 +78,10 @@ inline const wchar_t* MakeCfxSubProcess(const std::wstring& processType, const s
 #if defined(GTA_FIVE) || defined(IS_RDR3)
 		auto buildNumber = xbr::GetGameBuild();
 
-		if (buildNumber != xbr::GetDefaultGameBuild())
-		{
+		// if (buildNumber != xbr::GetDefaultGameBuild())
+		// {
 			productName += fmt::sprintf(L"b%d_", buildNumber);
-		}
+		// }
 #endif
 #endif
 	}

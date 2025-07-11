@@ -73,11 +73,11 @@ try {
         Invoke-PackServer -Context $ctx -Tools $tools
     }.GetNewClosure()
 
-    if ($ctx.IsPublicBuild){
-        Invoke-LogSection "Creating sentry release" {
-            Invoke-SentryCreateRelease -Context $ctx -Version $ctx.GitTag
-        }.GetNewClosure()
-    }
+    # if ($ctx.IsPublicBuild){
+    #     Invoke-LogSection "Creating sentry release" {
+    #         Invoke-SentryCreateRelease -Context $ctx -Version $ctx.GitTag
+    #     }.GetNewClosure()
+    # }
 
     $ctx.finishBuild()
 } catch {

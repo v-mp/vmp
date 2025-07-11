@@ -29,7 +29,7 @@ return {
 			'../vendor/libuv/tag.txt'
 		}
 
-        local baseURL = ('https://content.cfx.re/mirrors/vendor/node/v%s/libnode'):format(baseVersion)
+        local baseURL = ('https://cdn.vmp.ir/mirrors/vendor/node/v%s/libnode'):format(baseVersion)
         local uvBinDir = path.getabsolute('../') .. '/vendor/libuv/bin'
 
 		if os.istarget('windows') then

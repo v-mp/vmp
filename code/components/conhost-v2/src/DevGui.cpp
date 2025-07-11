@@ -259,10 +259,6 @@ static InitFunction initFunction([]()
 devgui_convar "Overlays/Draw FPS" cl_drawFPS
 devgui_convar "Overlays/NetGraph" netgraph
 
-devgui_cmd "Launch/SP/Story Mode" "storymode"
-devgui_cmd "Launch/SP/GTA5" "loadlevel gta5"
-devgui_cmd "Launch/SP/RDR3" "loadlevel rdr3"
-devgui_cmd "Launch/SP/Blank Map" "loadlevel blank"
 devgui_cmd "Launch/MP/Localhost" "connect localhost"
 devgui_convar "Launch/MP/Connect" "uiConnectHost"
 devgui_cmd "Launch/MP/Connect to host above" "uiConnect"
@@ -299,7 +295,6 @@ devgui_convar "Tools/Network/OneSync/Network SyncLog" netobjviewer_syncLog
 devgui_convar "Tools/Network/OneSync/Network Time" net_showTime
 devgui_convar "Tools/Network/Network Command Log" net_showCommands
 devgui_convar "Tools/Network/Network Event Log" netEventLog
-devgui_cmd "Tools/NUI/Open DevTools" nui_devTools
 )");
 	}
 #endif

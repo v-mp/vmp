@@ -24,6 +24,7 @@ inline int GetPureLevel()
 
 	int argc;
 	wchar_t** wargv = CommandLineToArgvW(cli.data(), &argc);
+	bool found = false;
 	for (int i = 1; i < argc; i++)
 	{
 		std::wstring_view arg = wargv[i];
@@ -31,10 +32,23 @@ inline int GetPureLevel()
 		if (found != std::wstring_view::npos)
 		{
 			pureLevel = _wtoi(&arg[found + 5]);
+			found = true;
 			break;
 		}
 	}
 	LocalFree(wargv);
+
+	if (!found)
+	{
+		std::wstring fpath = MakeRelativeCitPath(L"VMP.ini");
+
+		auto tempPureLevel = GetPrivateProfileInt(L"Game", L"PureLevel", -1, fpath.c_str());
+
+		if (tempPureLevel != -1)
+		{
+			pureLevel = tempPureLevel;
+		}
+	}
 
 	return pureLevel;
 }

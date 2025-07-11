@@ -422,7 +422,7 @@ static void OnFreeNodeError(rage::sysMemSimpleAllocator* self, rage::sysMemSimpl
 
 static HookFunction hookFunction([]()
 {
-	EnableMemoryChecks = GetPrivateProfileInt(L"Game", L"EnableHeapValidation", 0, MakeRelativeCitPath(L"CitizenFX.ini").c_str()) != 0;
+	EnableMemoryChecks = GetPrivateProfileInt(L"Game", L"EnableHeapValidation", 0, MakeRelativeCitPath(L"VMP.ini").c_str()) != 0;
 
 	if (EnableMemoryChecks)
 	{

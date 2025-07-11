@@ -393,11 +393,13 @@ static InitFunction initFunction([] ()
 
 	static ConsoleCommand loadLevelCommand("loadlevel", [](const std::string& level)
 	{
+		return;
 		LoadLevel(level.c_str(), Mode::LEVEL_LOAD);
 	});
 
 	static ConsoleCommand storyModeyCommand("storymode", []()
 	{
+		return;
 		LoadLevel("gta5", Mode::STORY_MODE);
 	});
 

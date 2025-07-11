@@ -36,6 +36,6 @@
 	</dependency>
 	<assemblyIdentity
 		type="win32"
-		name="FiveM"
+		name="VMP"
 		version="1.0.0.0" />
 </assembly>

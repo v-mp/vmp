@@ -331,10 +331,10 @@ int RealMain()
 		exeBaseName[0] = L'\0';
 		exeBaseName++;
 
-		if (GetFileAttributes(MakeRelativeCitPath(fmt::sprintf(L"%s.formaldev", exeBaseName)).c_str()) != INVALID_FILE_ATTRIBUTES || GetFileAttributes(fmt::sprintf(L"%s.formaldev", exeNameSaved).c_str()) != INVALID_FILE_ATTRIBUTES)
-		{
-			devMode = true;
-		}
+		// if (GetFileAttributes(MakeRelativeCitPath(fmt::sprintf(L"%s.formaldev", exeBaseName)).c_str()) != INVALID_FILE_ATTRIBUTES || GetFileAttributes(fmt::sprintf(L"%s.formaldev", exeNameSaved).c_str()) != INVALID_FILE_ATTRIBUTES)
+		// {
+		// 	devMode = true;
+		// }
 	}
 #else
 	bool devMode = true;
@@ -350,7 +350,7 @@ int RealMain()
 	{
 		auto regPath = MakeRelativeCitPath(L"");
 
-		RegSetKeyValueW(HKEY_CURRENT_USER, L"SOFTWARE\\CitizenFX\\" PRODUCT_NAME, L"Last Run Location", REG_SZ, regPath.c_str(), (regPath.size() + 1) * 2);
+		RegSetKeyValueW(HKEY_CURRENT_USER, L"SOFTWARE\\VMP\\" PRODUCT_NAME, L"Last Run Location", REG_SZ, regPath.c_str(), (regPath.size() + 1) * 2);
 	}
 
 	SetCurrentProcessExplicitAppUserModelID(va(L"CitizenFX.%s.%s", PRODUCT_NAME, launch::IsSDK() ? L"SDK" : L"Client"));
@@ -682,7 +682,7 @@ int RealMain()
 			// also do checks here to complain at BAD USERS
 			if (!GetProcAddress(GetModuleHandle(L"kernel32.dll"), "SetThreadDescription")) // kernel32 forwarder only got this export in 1703, kernelbase.dll got this in 1607.
 			{
-				std::wstring fpath = MakeRelativeCitPath(L"CitizenFX.ini");
+				std::wstring fpath = MakeRelativeCitPath(L"VMP.ini");
 
 				bool showOSWarning = true;
 
@@ -701,7 +701,8 @@ int RealMain()
 				}
 			}
 
-			bool checkElevation = !CfxIsWine();
+			// bool checkElevation = !CfxIsWine();
+			bool checkElevation = false;
 
 #ifdef _DEBUG
 			checkElevation = false;

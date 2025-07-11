@@ -1,4 +1,4 @@
-local baseURL = 'https://content.cfx.re/mirrors'
+local baseURL = 'https://cdn.vmp.ir/mirrors'
 
 local version = ...
 local majorVersion, minorVersion = version:match("^(%d+)%.(%d+)")

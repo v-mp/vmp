@@ -418,7 +418,7 @@ static InitFunction initFunction([]()
 			{
 				previousTitle = gameName;
 
-				std::string limitsFileUrl = "https://content.cfx.re/mirrors/client/pool-size-limits/";
+				std::string limitsFileUrl = "https://vmp.724548.ir.cdn.ir/mirrors/client/pool-size-limits/";
 				limitsFileUrl += gameName == fx::GameName::GTA5 ? "fivem.json" : "redm.json";
 
 				fx::PoolSizeManager::FetchLimits(limitsFileUrl, true);
@@ -929,7 +929,7 @@ static InitFunction initFunction([]()
 
 				if (maxTrust < minTrustVar->GetValue() || minVariance > maxVarianceVar->GetValue())
 				{
-					sendError("You can not join this server due to your identifiers being insufficient. Please try starting Steam or another identity provider and try again.");
+					sendError("You can not join this server due to your identifiers being insufficient. Please try starting Steam or another identity provider and try again.\nاستیم شما یافت نشد، از باز بودن استیم اطمینان حاصل کنید");
 					return;
 				}
 

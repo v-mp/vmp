@@ -33,7 +33,7 @@ return {
 			('../vendor/libnode/tag.txt'):format(baseVersion)
 		}
 
-        local baseURL = ('https://content.cfx.re/mirrors/vendor/node/v%s/libnode'):format(baseVersion)
+        local baseURL = ('https://cdn.vmp.ir/mirrors/vendor/node/v%s/libnode'):format(baseVersion)
         local nodeBinDir = path.getabsolute('../') .. '/vendor/libnode/bin'
 
 		if os.istarget('windows') then

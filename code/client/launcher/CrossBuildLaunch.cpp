@@ -69,7 +69,7 @@ void XBR_EarlySelect()
 		return;
 	}
 
-	std::wstring fpath = MakeRelativeCitPath(L"CitizenFX.ini");
+	std::wstring fpath = MakeRelativeCitPath(L"VMP.ini");
 	auto retainedBuild = GetPrivateProfileInt(L"Game", L"SavedBuildNumber", xbr::GetDefaultGameBuild(), fpath.c_str());
 
 	// If there is no explicit build flag and retained build is not default - add flag to command line.

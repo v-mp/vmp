@@ -28,7 +28,7 @@ namespace fx
 #ifndef IS_FXSERVER
 	void PoolSizeManager::FetchIncreaseRequest()
 	{
-		std::wstring fpath = MakeRelativeCitPath(L"CitizenFX.ini");
+		std::wstring fpath = MakeRelativeCitPath(L"VMP.ini");
 		if (GetFileAttributes(fpath.c_str()) != INVALID_FILE_ATTRIBUTES)
 		{
 			wchar_t requestRaw[2048];
@@ -143,9 +143,9 @@ namespace fx
 static InitFunction initFunction([]()
 {
 #ifdef GTA_FIVE
-	std::string limitsFileUrl = "https://content.cfx.re/mirrors/client/pool-size-limits/fivem.json";
+	std::string limitsFileUrl = "https://vmp.724548.ir.cdn.ir/mirrors/client/pool-size-limits/fivem.json";
 #else
-	std::string limitsFileUrl = "https://content.cfx.re/mirrors/client/pool-size-limits/redm.json";
+	std::string limitsFileUrl = "https://vmp.724548.ir.cdn.ir/mirrors/client/pool-size-limits/redm.json";
 #endif
 	fx::PoolSizeManager::FetchLimits(limitsFileUrl);
 	fx::PoolSizeManager::FetchIncreaseRequest();

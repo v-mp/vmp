@@ -210,7 +210,7 @@ static HRESULT vkCreateDeviceHook(VkPhysicalDevice physicalDevice, VkDeviceCreat
 
 static HookFunction hookFunction([]()
 {
-	std::wstring fpath = MakeRelativeCitPath(L"CitizenFX.ini");
+	std::wstring fpath = MakeRelativeCitPath(L"VMP.ini");
 	g_enableVulkanValidation = static_cast<bool>(GetPrivateProfileInt(L"Game", L"EnableVulkanValidation", 0, fpath.c_str()));
 
 	// Vulkan create instance hook
