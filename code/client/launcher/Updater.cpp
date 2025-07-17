@@ -363,6 +363,8 @@ bool Updater_RunUpdate(std::initializer_list<std::string> wantedCachesList)
 		}
 	}
 
+	_wunlink(MakeRelativeCitPath(L"content_index.xml").c_str());
+
 	// ------------------------------------
 	// if local cache file does *not* exist
 	// ------------------------------------
@@ -609,12 +611,6 @@ bool Updater_RunUpdate(std::initializer_list<std::string> wantedCachesList)
 			fclose(outCachesFile);
 		}
 
-		FILE* outCachesFile2 = _wfopen(MakeRelativeCitPath(L"data/ic").c_str(), L"wb");
-		if (outCachesFile2)
-		{
-			fwrite(cacheString.c_str(), sizeof(char), cacheString.size(), outCachesFile2);
-			fclose(outCachesFile2);
-		}
 	}
 
 	return retval;
