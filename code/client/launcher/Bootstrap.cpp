@@ -93,7 +93,7 @@ bool Bootstrap_DoBootstrap()
 	{
 		bool recovered = false;
 
-		STR_CONTENT_URL = "https://cdn.vmp.ir/updates";
+		STR_CONTENT_URL = "http://cdn.vmp.ir/updates";
 
 		// if not production, try to recover
 		if (GetUpdateChannel() != "production")
@@ -111,7 +111,7 @@ bool Bootstrap_DoBootstrap()
 		{
 			if (GetFileAttributes(MakeRelativeCitPath(L"CoreRT.dll").c_str()) == INVALID_FILE_ATTRIBUTES)
 			{
-				UI_DisplayError(ToWide(va("An error (%i, %s) occurred while checking the bootstrapper version. Check if " CFX_UPDATER_URL " is available in your web browser.", result, DL_RequestURLError())).c_str());
+				UI_DisplayError(ToWide(va("An error (%i, %s) occurred while checking the bootstrapper version. Check if %s is available in your web browser.", result, DL_RequestURLError(), STR_CONTENT_URL)).c_str());
 				return false;
 			}
 
@@ -128,7 +128,7 @@ bool Bootstrap_DoBootstrap()
 		{
 			if (GetFileAttributes(MakeRelativeCitPath(L"CoreRT.dll").c_str()) == INVALID_FILE_ATTRIBUTES)
 			{
-				UI_DisplayError(ToWide(va("An error (%i, %s) occurred while checking the bootstrapper version. Check if " CFX_UPDATER_URL " is available in your web browser.", result, DL_RequestURLError())).c_str());
+				UI_DisplayError(ToWide(va("An error (%i, %s) occurred while checking the bootstrapper version. Check if %s is available in your web browser.", result, DL_RequestURLError(), STR_CONTENT_URL)).c_str());
 				return false;
 			}
 

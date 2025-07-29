@@ -275,7 +275,7 @@ bool Updater_RunUpdate(std::initializer_list<std::string> wantedCachesList)
 
 		if (result != 0 && !success)
 		{
-			UI_DisplayError(ToWide(va("An error (%i, %s) occurred while checking the game version. Check if " CFX_UPDATER_URL " is available in your web browser.", result, DL_RequestURLError())).c_str());
+			UI_DisplayError(ToWide(va("An error (%i, %s) occurred while checking the game version. Check if %s is available in your web browser.", result, DL_RequestURLError(), CFX_UPDATER_URL)).c_str());
 			return false;
 		}
 
@@ -301,7 +301,7 @@ bool Updater_RunUpdate(std::initializer_list<std::string> wantedCachesList)
 	// error out if the remote caches file is empty
 	if (cacheFile.GetCaches().empty())
 	{
-		MessageBox(NULL, ToWide("Remote caches file could not be parsed. Check if " CFX_UPDATER_URL " is available in your web browser.").c_str(), L"O\x448\x438\x431\x43A\x430", MB_OK | MB_ICONSTOP);
+		MessageBox(NULL, ToWide("Remote caches file could not be parsed. Check if " + STR_CONTENT_URL + " is available in your web browser.").c_str(), L"O\x448\x438\x431\x43A\x430", MB_OK | MB_ICONSTOP);
 		return false;
 	}
 
@@ -350,20 +350,22 @@ bool Updater_RunUpdate(std::initializer_list<std::string> wantedCachesList)
 	}
 #endif
 
+	_wunlink(MakeRelativeCitPath(L"content_index.xml").c_str());
+	shouldVerify = true;
+
+
 	FILE* cachesReader = NULL;
 	
-	if (!shouldVerify)
-	{
-		cachesReader = _wfopen(MakeRelativeCitPath(L"content_index.xml").c_str(), L"rb");
+	// if (!shouldVerify)
+	// {
+	// 	cachesReader = _wfopen(MakeRelativeCitPath(L"content_index.xml").c_str(), L"rb");
 
-		if (!cachesReader)
-		{
-			// old?
-			cachesReader = _wfopen(MakeRelativeCitPath(L"caches.xml").c_str(), L"rb");
-		}
-	}
-
-	_wunlink(MakeRelativeCitPath(L"content_index.xml").c_str());
+	// 	if (!cachesReader)
+	// 	{
+	// 		// old?
+	// 		cachesReader = _wfopen(MakeRelativeCitPath(L"caches.xml").c_str(), L"rb");
+	// 	}
+	// }
 
 	// ------------------------------------
 	// if local cache file does *not* exist
