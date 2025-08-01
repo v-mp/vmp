@@ -93,7 +93,7 @@ bool Bootstrap_DoBootstrap()
 	{
 		bool recovered = false;
 
-		STR_CONTENT_URL = "http://cdn.vmp.ir/updates";
+		STR_CONTENT_URL = "https://cdn.vmp.ir/updates";
 
 		// if not production, try to recover
 		if (GetUpdateChannel() != "production")
