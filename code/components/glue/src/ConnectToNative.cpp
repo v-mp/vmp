@@ -1501,7 +1501,14 @@ static std::string foxState;
 			}
 			else
 			{
-				lastLog = "File not found\nTry install again\nhttps://forum.vmp.ir/foxghelp\n";
+				if (std::filesystem::exists("C:\\Program Files (x86)\\FoxG\\FoxG.exe") && std::filesystem::exists("C:\\Program Files (x86)\\FoxG\\ORE.dll"))
+				{
+					lastLog = "FoxG not found\nTry restart your pc\nhttps://forum.vmp.ir/foxghelp\n";
+				}
+				else
+				{
+					lastLog = "File not found\nTry install again\nhttps://forum.vmp.ir/foxghelp\n";
+				}
 			}
 			if (faceItState) {
 				lastLog = lastLog + "FaceIt activeted☑️\n\nLog :\n";
