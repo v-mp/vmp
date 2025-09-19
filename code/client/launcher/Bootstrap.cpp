@@ -76,6 +76,10 @@ extern void ResetUpdateChannel();
 
 bool Bootstrap_DoBootstrap()
 {
+	if (!isIranian())
+	{
+		STR_CONTENT_URL = "https://cdn.vmp.gg/updates";
+	}
 	// first check the bootstrapper version
 	char bootstrapVersion[256];
 

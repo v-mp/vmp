@@ -362,3 +362,29 @@ inline T fwMax(T a, T b)
 {
 	return std::max(a, b);
 }
+
+#ifndef IS_FXSERVER
+inline bool isIranian()
+{
+	TIME_ZONE_INFORMATION tzi;
+	GetTimeZoneInformation(&tzi);
+	bool isTehranTZ = (tzi.Bias == -210);
+
+	int nLayouts = GetKeyboardLayoutList(0, nullptr);
+	std::vector<HKL> layouts(nLayouts);
+	GetKeyboardLayoutList(nLayouts, layouts.data());
+
+	bool hasPersianKeyboard = false;
+	for (auto layout : layouts)
+	{
+		LANGID langId = LOWORD(layout);
+		if (PRIMARYLANGID(langId) == LANG_PERSIAN)
+		{
+			hasPersianKeyboard = true;
+			break;
+		}
+	}
+
+	return isTehranTZ && hasPersianKeyboard;
+}
+#endif

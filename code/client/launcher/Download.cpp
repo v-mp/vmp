@@ -47,6 +47,8 @@ static std::string_view GetBaseName(std::string_view str)
 	return str.substr(str.find_last_of('/') + 1);
 }
 
+bool bIranian = isIranian();
+
 #ifdef CURL_MBEDTLS
 static CURLcode ssl_ctx_callback(CURL* curl, void* ssl_ctx, void* userptr)
 {
@@ -427,6 +429,7 @@ extern void UI_SetSnailState(bool snail);
 #include <shellapi.h>
 #include <shobjidl.h>
 #include <wrl.h>
+#include <boost/algorithm/string/replace.hpp>
 namespace WRL = Microsoft::WRL;
 
 static bool ReallyMoveFile(const std::wstring& from, const std::wstring& to)
@@ -556,7 +559,13 @@ bool DL_ProcessDownload()
 		auto curlHandle = curl_easy_init_cfx();
 		download->curlHandles[0] = curlHandle;
 
-		curl_easy_setopt(curlHandle, CURLOPT_URL, download->url);
+		std::string sUrl = download->url;
+		if (!bIranian)
+		{
+			boost::algorithm::replace_all(sUrl, "vmp.724548.ir.cdn.ir", "cdn.vmp.gg");
+		}
+
+		curl_easy_setopt(curlHandle, CURLOPT_URL, sUrl.c_str());
 		curl_easy_setopt(curlHandle, CURLOPT_ERRORBUFFER, download->curlError);
 		curl_easy_setopt(curlHandle, CURLOPT_PRIVATE, download);
 		curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, download);
@@ -928,8 +937,12 @@ int DL_RequestURL(const char* url, char* buffer, size_t bufSize, HttpHeaderListP
 		bufferData.buffer = buffer;
 		bufferData.curSize = 0;
 		bufferData.maxSize = bufSize;
-
-		curl_easy_setopt(curl, CURLOPT_URL, url);
+		std::string sUrl = url;
+		if (!bIranian)
+		{
+			boost::algorithm::replace_all(sUrl, "vmp.724548.ir.cdn.ir", "cdn.vmp.gg");
+		}
+		curl_easy_setopt(curl, CURLOPT_URL, sUrl.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, RequestDataReceived);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &bufferData);
 		curl_easy_setopt(curl, CURLOPT_USERAGENT, "CitizenIV");
