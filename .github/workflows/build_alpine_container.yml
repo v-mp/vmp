@@ -5,7 +5,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: fivem-builder-linux-alpine
+  IMAGE_NAME: vmp-builder-linux-alpine
 
 jobs:
   build-and-push-image:
