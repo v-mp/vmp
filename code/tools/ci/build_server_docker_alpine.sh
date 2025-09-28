@@ -2,7 +2,7 @@
 set -e
 
 export CI_BRANCH=$CI_COMMIT_REF_NAME
-export CI_BUILD_NUMBER='v1.0.0.'$CI_PIPELINE_ID
+export CI_BUILD_NUMBER="v1.0.0.$((CI_PIPELINE_ID + 100183))"
 
 CURRENT_FOLDER_NAME=$(basename "$PWD")
 
@@ -10,7 +10,7 @@ cd ..
 
 # clone fivem-private
 if [ ! -d fivem-private ]; then
-    git clone $FIVEM_PRIVATE_URI -b master
+    git clone $FIVEM_PRIVATE_URI -b master fivem-private
 else
     cd fivem-private
     git remote set-url origin $FIVEM_PRIVATE_URI
@@ -19,7 +19,10 @@ else
     cd ..
 fi
 
-echo "private_repo '../../fivem-private/'" >fivem/code/privates_config.lua
+cp "fivem-private/InitConnectMethod.cpp" "vmp/code/components/citizen-server-impl/src/InitConnectMethod.cpp"
+
+echo "private_repo '../../fivem-private/'" >vmp/code/privates_config.lua
+
 
 # start building
 cd $CURRENT_FOLDER_NAME
@@ -109,26 +112,26 @@ chmod +x $PWD/run.sh
 
 chown -R build:build $PWD/.
 
-# upload debug info
-cd $PWD/ext/symbol-upload
+# # upload debug info
+# cd $PWD/ext/symbol-upload
 
-mkdir -p /tmp/symbols
-dotnet restore
-dotnet run -- -o/tmp/symbols $PWD/../../alpine/opt/cfx-server/*.so $PWD/../../alpine/opt/cfx-server/FXServer $PWD/../../alpine/opt/cfx-server/*.dbg $PWD/../../alpine/lib/*.so* $PWD/../../alpine/usr/lib/*.so* $PWD/../../alpine/usr/lib/debug/lib/*.debug
+# mkdir -p /tmp/symbols
+# dotnet restore
+# dotnet run -- -o/tmp/symbols $PWD/../../alpine/opt/cfx-server/*.so $PWD/../../alpine/opt/cfx-server/FXServer $PWD/../../alpine/opt/cfx-server/*.dbg $PWD/../../alpine/lib/*.so* $PWD/../../alpine/usr/lib/*.so* $PWD/../../alpine/usr/lib/debug/lib/*.debug
 
-eval $(ssh-agent -s)
-echo "$SSH_SYMBOLS_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+# eval $(ssh-agent -s)
+# echo "$SSH_SYMBOLS_PRIVATE_KEY" | tr -d '\r' | ssh-add -
 
-mkdir -p ~/.ssh
-chmod 700 ~/.ssh
+# mkdir -p ~/.ssh
+# chmod 700 ~/.ssh
 
-if [ "$CFX_DRY_RUN" = "true" ]; then
-    echo "DRY RUN: Would upload debug symbols"
-else
-    rsync -rav -e "$RSH_SYMBOLS_COMMAND" /tmp/symbols/ $SSH_SYMBOLS_TARGET || true
-fi
+# if [ "$CFX_DRY_RUN" = "true" ]; then
+#     echo "DRY RUN: Would upload debug symbols"
+# else
+#     rsync -rav -e "$RSH_SYMBOLS_COMMAND" /tmp/symbols/ $SSH_SYMBOLS_TARGET || true
+# fi
 
-cd ../../
+# cd ../../
 
 # delete bundled debug info
 rm -f $PWD/alpine/opt/cfx-server/*.dbg

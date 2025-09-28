@@ -61,7 +61,7 @@ premake5 gmake2 --game=server --cc=clang --dotnet=msnet
 cd build/server/linux
 
 export CFLAGS="-fno-plt"
-export CXXFLAGS="-D_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR -Wno-deprecated-declarations -Wno-invalid-offsetof -fno-plt"
+export CXXFLAGS="-D_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR -Wno-deprecated-declarations -Wno-invalid-offsetof -fno-plt -include cstdint"
 export LDFLAGS="-Wl,--build-id -fuse-ld=lld"
 
 if [ ! -z "$CI_BRANCH" ] && [ ! -z "$CI_BUILD_NUMBER" ]; then
