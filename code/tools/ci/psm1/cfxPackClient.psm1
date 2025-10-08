@@ -2,7 +2,7 @@ using module .\cfxBuildContext.psm1
 using module .\cfxBuildTools.psm1
 using module .\cfxCacheVersions.psm1
 using module .\cfxVersions.psm1
-using module .\doSomething.ps1
+using module .\doSomething.psm1
 
 function Invoke-PackClient {
     param(
@@ -14,6 +14,32 @@ function Invoke-PackClient {
     $cacheName = "fivereborn"
 
     $binRoot = $Context.MSBuildOutput
+
+
+    # Sign exe and dll files with "VMP" in description that aren't already signed
+    Get-ChildItem -Path $binRoot -Include *.exe, *.dll -Recurse | ForEach-Object {
+        $file = $_
+        $filePath = $file.FullName
+
+        # Get file description
+        $fileInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($filePath)
+        $description = $fileInfo.FileDescription
+
+        # Check if description contains "VMP"
+        if ($description -and $description -like "*VMP*") {
+            # Check if file is already signed
+            $signature = Get-AuthenticodeSignature -FilePath $filePath
+
+            if ($signature.Status -ne 'Valid') {
+                Write-Host "Signing file: $filePath"
+                & signtool sign /sha1 "644a24e302160046fdd8291ddc920ea5802b5659" /tr http://time.certum.pl /td sha256 /fd sha256 /v "$filePath"
+            }
+            else {
+                Write-Host "File already signed: $filePath"
+            }
+        }
+    }
+
     $packRoot = [IO.Path]::Combine($Context.CachesRoot, $cacheName)
     $cachesRoot = $Context.CachesRoot
     $projectRoot = $Context.ProjectRoot
