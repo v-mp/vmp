@@ -76,10 +76,10 @@ extern void ResetUpdateChannel();
 
 bool Bootstrap_DoBootstrap()
 {
-	if (!isIranian())
-	{
-		STR_CONTENT_URL = "https://cdn.vmp.gg/updates";
-	}
+	// if (!isIranian())
+	// {
+	// 	STR_CONTENT_URL = "https://cdn.vmp.gg/updates";
+	// }
 	// first check the bootstrapper version
 	char bootstrapVersion[256];
 
@@ -87,7 +87,7 @@ bool Bootstrap_DoBootstrap()
 
 	auto fetchContent = [&contentHeaders, &bootstrapVersion](const std::string& updateChannel)
 	{
-		return DL_RequestURL(va(STR_CONTENT_URL + "/heads/" CONTENT_NAME "/%scachebypass%lld", updateChannel, _time64(NULL)), bootstrapVersion, sizeof(bootstrapVersion), contentHeaders);
+		return DL_RequestURL(va(STR_CONTENT_URL + "/heads/" CONTENT_NAME "/%s", updateChannel), bootstrapVersion, sizeof(bootstrapVersion), contentHeaders);
 	};
 
 	int result = fetchContent(GetUpdateChannel());

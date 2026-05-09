@@ -142,11 +142,11 @@ namespace fx
 #ifndef IS_FXSERVER
 static InitFunction initFunction([]()
 {
-	std::string domain = "https://vmp.724548.ir.cdn.ir";
-	if (!isIranian)
-	{
-		domain = "https://cdn.vmp.gg";
-	}
+	std::string domain = "https://cdn.vmp.ir";
+	// if (!isIranian)
+	// {
+	// 	domain = "https://cdn.vmp.gg";
+	// }
 #ifdef GTA_FIVE
 	std::string limitsFileUrl = domain + "/mirrors/client/pool-size-limits/fivem.json";
 #else

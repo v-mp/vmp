@@ -271,7 +271,7 @@ bool Updater_RunUpdate(std::initializer_list<std::string> wantedCachesList)
 		char bootstrapVersion[256];
 
 		auto contentHeaders = std::make_shared<HttpHeaderList>();
-		int result = DL_RequestURL(va(STR_CONTENT_URL + "/heads/%s/%scachebypass%lld", cacheName, GetUpdateChannel(), _time64(NULL)), bootstrapVersion, sizeof(bootstrapVersion), contentHeaders);
+		int result = DL_RequestURL(va(STR_CONTENT_URL + "/heads/%s/%s", cacheName, GetUpdateChannel()), bootstrapVersion, sizeof(bootstrapVersion), contentHeaders);
 
 		if (result != 0 && !success)
 		{

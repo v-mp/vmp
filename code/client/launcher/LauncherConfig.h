@@ -8,7 +8,7 @@
 #pragma once
 
 #ifndef CFX_UPDATER_URL
-#define CFX_UPDATER_URL "https://vmp.724548.ir.cdn.ir/updates"
+#define CFX_UPDATER_URL "https://cdn.vmp.ir/updates"
 #endif
 
 inline std::string STR_CONTENT_URL = CFX_UPDATER_URL;

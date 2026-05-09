@@ -560,10 +560,10 @@ bool DL_ProcessDownload()
 		download->curlHandles[0] = curlHandle;
 
 		std::string sUrl = download->url;
-		if (!bIranian)
-		{
-			boost::algorithm::replace_all(sUrl, "vmp.724548.ir.cdn.ir", "cdn.vmp.gg");
-		}
+		// if (!bIranian)
+		// {
+		// 	boost::algorithm::replace_all(sUrl, "vmp.724548.ir.cdn.ir", "cdn.vmp.gg");
+		// }
 
 		curl_easy_setopt(curlHandle, CURLOPT_URL, sUrl.c_str());
 		curl_easy_setopt(curlHandle, CURLOPT_ERRORBUFFER, download->curlError);
@@ -938,10 +938,10 @@ int DL_RequestURL(const char* url, char* buffer, size_t bufSize, HttpHeaderListP
 		bufferData.curSize = 0;
 		bufferData.maxSize = bufSize;
 		std::string sUrl = url;
-		if (!bIranian)
-		{
-			boost::algorithm::replace_all(sUrl, "vmp.724548.ir.cdn.ir", "cdn.vmp.gg");
-		}
+		// if (!bIranian)
+		// {
+		// 	boost::algorithm::replace_all(sUrl, "vmp.724548.ir.cdn.ir", "cdn.vmp.gg");
+		// }
 		curl_easy_setopt(curl, CURLOPT_URL, sUrl.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, RequestDataReceived);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &bufferData);
