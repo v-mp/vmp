@@ -179,6 +179,8 @@ private:
 
 	std::string m_richError;
 
+	std::string m_connectData;
+
 	HANDLE m_receiveEvent;
 
 	bool m_disconnecting = false;
@@ -229,6 +231,8 @@ public:
 	virtual void RunFrame() override;
 
 	virtual concurrency::task<void> ConnectToServer(const std::string& rootUrl);
+
+	void SetConnectData(const std::string& data) { m_connectData = data; }
 
 	virtual void Disconnect(const char* reason = "[not set]") override;
 

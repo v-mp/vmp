@@ -13,6 +13,8 @@
 
 #include <MakeClientFunction.h>
 
+#include <FormData.h>
+
 #include "fxScripting.h"
 
 static void CreatePlayerCommands();
@@ -100,6 +102,34 @@ static void CreatePlayerCommands()
 		str = client->GetTcpEndPoint();
 
 		return str.c_str();
+	}));
+
+	fx::ScriptEngine::RegisterNativeHandler("GET_PLAYER_CONNECTION_PARAM", MakeClientFunction([](fx::ScriptContext& context, const fx::ClientSharedPtr& client) -> const char*
+	{
+		const char* key = context.GetArgument<const char*>(1);
+
+		if (!key)
+		{
+			return nullptr;
+		}
+
+		static thread_local std::string result;
+		result.clear();
+
+		try
+		{
+			auto params = net::DecodeFormData(fx::AnyCast<std::string>(client->GetData("connectionParams")));
+
+			if (auto it = params.find(key); it != params.end())
+			{
+				result = it->second;
+			}
+		}
+		catch (std::bad_any_cast&)
+		{
+		}
+
+		return result.empty() ? nullptr : result.c_str();
 	}));
 
 	fx::ScriptEngine::RegisterNativeHandler("GET_PLAYER_PING", MakeClientFunction([](fx::ScriptContext& context, const fx::ClientSharedPtr& client)

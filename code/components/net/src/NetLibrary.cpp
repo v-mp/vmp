@@ -988,6 +988,16 @@ concurrency::task<void> NetLibrary::ConnectToServer(const std::string& rootUrl)
 
 	postMap["guid"] = va("%lld", GetGUID());
 
+	if (!m_connectData.empty())
+	{
+		postMap["connectionParams"] = m_connectData;
+	}
+	else
+	{
+		postMap.erase("connectionParams");
+	}
+	m_connectData.clear();
+
 	static bool isLegacyDeferral;
 	isLegacyDeferral = false;
 

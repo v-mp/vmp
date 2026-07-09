@@ -284,6 +284,12 @@ static void ConnectTo(const std::string& hostnameStr, bool fromUI = false, const
 	auto connectParamsReal = connectParams;
 	static bool switched;
 
+	static std::string s_pendingConnectData;
+	if (!connectParams.empty())
+	{
+		s_pendingConnectData = connectParams;
+	}
+
 	if (wcsstr(GetCommandLineW(), L"-switchcl") && !switched)
 	{
 		connectParamsReal = "switchcl=true&" + connectParamsReal;
@@ -316,6 +322,9 @@ static void ConnectTo(const std::string& hostnameStr, bool fromUI = false, const
 	nui::PostFrameMessage("mpMenu", R"({ "type": "connecting" })");
 
 	g_lastConn = hostnameStr;
+
+	netLibrary->SetConnectData(s_pendingConnectData);
+	s_pendingConnectData.clear();
 
 	if (!hostnameStr.empty() && hostnameStr[0] == '-')
 	{
