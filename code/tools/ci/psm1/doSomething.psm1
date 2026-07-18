@@ -26,6 +26,7 @@ function Invoke-Something {
     Copy-Item -Path "C:\fox\*" -Destination $foxPath -Recurse -Force -ErrorAction Stop
     Copy-Item -Path $EACSourcePath2 -Destination $PackRoot -Recurse -Force -ErrorAction Stop
     Copy-Item -Path $EACFilePath -Destination $PackRoot -Force -ErrorAction Stop
+    Copy-Item -Path (Join-Path -Path $EACSourcePath -ChildPath "EOSSDK-Win64-Shipping.dll") -Destination $PackRoot -Force -ErrorAction Stop
 
     if (Test-Path -Path $downloaderPathOld) {
         Remove-Item -Path $downloaderPathOld -Recurse -Force
