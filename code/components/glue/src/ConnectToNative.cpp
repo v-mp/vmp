@@ -56,7 +56,6 @@
 #include "GameInit.h"
 #include "CnlEndpoint.h"
 #include "PacketHandler.h"
-#include "PaymentRequest.h"
 
 #include "LinkProtocolIPC.h"
 
@@ -106,14 +105,13 @@ static void SaveBuildNumber(uint32_t build)
 	}
 }
 
-static void SaveGameSettings(const std::wstring& poolIncreases, bool replaceExecutable)
+static void SaveGameSettings(const std::wstring& poolIncreases)
 {
 	std::wstring fpath = MakeRelativeCitPath(L"VMP.ini");
 
 	if (GetFileAttributes(fpath.c_str()) != INVALID_FILE_ATTRIBUTES)
 	{
 		WritePrivateProfileString(L"Game", L"PoolSizesIncrease", poolIncreases.c_str(), fpath.c_str());
-		WritePrivateProfileString(L"Game", L"ReplaceExecutable", replaceExecutable ? L"1" : L"0", fpath.c_str());
 	}
 }
 
@@ -127,7 +125,7 @@ static void SavePureLevel(uint32_t pureLevel)
 	}
 }
 
-void RestartGameToOtherBuild(int build, int pureLevel, std::wstring poolSizesIncreaseSetting, bool replaceExecutable)
+void RestartGameToOtherBuild(int build, int pureLevel, std::wstring poolSizesIncreaseSetting, int serverDefaultBuild)
 {
 #if defined(GTA_FIVE) || defined(IS_RDR3)
 	SECURITY_ATTRIBUTES securityAttributes = { 0 };
@@ -146,15 +144,14 @@ void RestartGameToOtherBuild(int build, int pureLevel, std::wstring poolSizesInc
 	hostData->GetLinkProtocol(),
 	ToWide(g_lastConn));
 
-	// we won't launch the default build if we don't do this
-	if (build == xbr::GetDefaultGameBuild())
-	{
-		SaveBuildNumber(xbr::GetDefaultGameBuild());
-	}
+	// Save the build number we're switching to so cold starts use the same build.
 	SaveBuildNumber(build);
 	SavePureLevel(pureLevel);
 
-	SaveGameSettings(poolSizesIncreaseSetting, replaceExecutable);
+	// Persist the server's default game build for exe selection on next launch.
+	xbr::SetEffectiveDefaultGameBuild(serverDefaultBuild);
+
+	SaveGameSettings(poolSizesIncreaseSetting);
 
 	trace("Switching from build %d to build %d...\n", xbr::GetRequestedGameBuild(), build);
 
@@ -190,7 +187,7 @@ void RestartGameToOtherBuild(int build, int pureLevel, std::wstring poolSizesInc
 #endif
 }
 
-extern void InitializeBuildSwitch(int build, int pureLevel, std::wstring poolSizesIncreaseSetting, bool replaceExecutable);
+extern void InitializeBuildSwitch(int build, int pureLevel, std::wstring poolSizesIncreaseSetting, int serverDefaultBuild);
 
 void saveSettings(const wchar_t *json) {
 	PWSTR appDataPath;
@@ -552,59 +549,6 @@ static void DisconnectCmd()
 
 extern void MarkNuiLoaded();
 
-static std::function<void()> g_onYesCallback;
-
-class PaymentRequestPacketHandler : public net::PacketHandler<net::packet::ServerPaymentRequest, HashRageString("msgPaymentRequest")>
-{
-public:
-	template<typename T>
-	bool Process(T& stream)
-	{
-		return ProcessPacket(stream, [](net::packet::ServerPaymentRequest& serverPaymentRequest)
-		{
-			try
-			{
-				auto json = nlohmann::json::parse(std::string(reinterpret_cast<const char*>(serverPaymentRequest.data.GetValue().data()), serverPaymentRequest.data.GetValue().size()));
-
-				se::ScopedPrincipal scope(se::Principal{ "system.console" });
-				console::GetDefaultContext()->GetVariableManager()->FindEntryRaw("warningMessageResult")->SetValue("0");
-				console::GetDefaultContext()->ExecuteSingleCommandDirect(ProgramArguments{ "warningmessage", "PURCHASE REQUEST", fmt::sprintf("The server is requesting a purchase of %s for %s.", json.value("sku_name", ""), json.value("sku_price", "")), "Do you want to purchase this item?", "20" });
-
-				g_onYesCallback = [json]()
-				{
-					std::map<std::string, std::string> postMap;
-					postMap["data"] = json.value<std::string>("data", "");
-					postMap["sig"] = json.value<std::string>("sig", "");
-					postMap["clientId"] = g_discourseClientId;
-					postMap["userToken"] = g_discourseUserToken;
-
-					Instance<HttpClient>::Get()->DoPostRequest("https://keymaster.fivem.net/api/paymentAssign", postMap, [](bool success, const char* data, size_t length)
-					{
-						if (success)
-						{
-							auto res = nlohmann::json::parse(std::string(data, length));
-							auto url = res.value("url", "");
-
-							if (!url.empty())
-							{
-								if (url.find("http://") == 0 || url.find("https://") == 0)
-								{
-									ShellExecute(nullptr, L"open", ToWide(url).c_str(), nullptr, nullptr, SW_SHOWNORMAL);
-								}
-							}
-						}
-					});
-				};
-			}
-			catch (const std::exception& e)
-			{
-
-			}
-		});
-	}
-};
-
-
 static InitFunction initFunction([] ()
 {
 	static std::function<void()> backfillDoneEvent;
@@ -703,9 +647,9 @@ static InitFunction initFunction([] ()
 			nui::PostRootMessage(fmt::sprintf(R"({ "type": "setServerAddress", "data": "%s" })", peerAddress));
 		});
 
-		netLibrary->OnRequestBuildSwitch.Connect([](int build, int pureLevel, std::wstring poolSizesIncreaseSetting, bool replaceExecutable)
+		netLibrary->OnRequestBuildSwitch.Connect([](int build, int pureLevel, std::wstring poolSizesIncreaseSetting, int serverDefaultBuild)
 		{
-			InitializeBuildSwitch(build, pureLevel, std::move(poolSizesIncreaseSetting), replaceExecutable);
+			InitializeBuildSwitch(build, pureLevel, std::move(poolSizesIncreaseSetting), serverDefaultBuild);
 			g_connected = false;
 		});
 
@@ -849,26 +793,6 @@ static InitFunction initFunction([] ()
 				ep.Call("unloaded");
 			}
 		}, 5000);
-
-		lib->AddPacketHandler<PaymentRequestPacketHandler>(true);
-	});
-
-	OnMainGameFrame.Connect([]()
-	{
-		if (g_onYesCallback)
-		{
-			int result = atoi(console::GetDefaultContext()->GetVariableManager()->FindEntryRaw("warningMessageResult")->GetValue().c_str());
-
-			if (result != 0)
-			{
-				if (result == 4)
-				{
-					g_onYesCallback();
-				}
-
-				g_onYesCallback = {};
-			}
-		}
 	});
 
 	OnKillNetwork.Connect([](const char*)
@@ -1026,7 +950,7 @@ static InitFunction initFunction([] ()
 
 	curChannel = ToNarrow(resultPath);
 
-	static ConVar<bool> uiPremium("ui_premium", ConVar_None, false);
+	static ConVar<bool> uiPremium("ui_premium", ConVar_Internal | ConVar_ScriptRestricted, false);
 
 	// ConVar_ScriptRestricted because update channel is often misused as a marker for other things
 	static ConVar<std::string> uiUpdateChannel("ui_updateChannel", ConVar_ScriptRestricted, curChannel,

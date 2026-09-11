@@ -20,10 +20,10 @@
 
 namespace rl
 {
-	bool MessageBufferLengthHack::GetState()
-	{
-		return false;
-	}
+bool MessageBufferLengthHack::GetState()
+{
+	return false;
+}
 }
 
 namespace fx
@@ -47,11 +47,14 @@ public:
 
 	void HandlePacketV2(int source, const net::packet::ReassembledEventV2& packet) override;
 
+#ifndef IS_FXSERVER
 	void TriggerEvent(int target, std::string_view eventName, std::string_view eventPayload, int bytesPerSecond) override;
+#endif
 
 	void TriggerEventV2(int target, std::string_view eventName, std::string_view eventPayload, int bytesPerSecond) override;
 
 	void NetworkTick() override;
+
 private:
 	using EventId = uint64_t;
 
@@ -96,6 +99,7 @@ private:
 	void UnregisterSendList(int target, std::unordered_map<EventId, std::shared_ptr<SendEvent>>& sendList);
 
 	void NetworkTickSendList(const std::chrono::milliseconds& timeNow, const std::chrono::milliseconds& dT, std::unordered_map<EventId, std::shared_ptr<SendEvent>>& sendList, uint32_t fragmentSize, bool v2 = false);
+
 private:
 	std::unordered_map<EventId, std::shared_ptr<SendEvent>> m_sendList;
 	std::unordered_map<EventId, std::shared_ptr<SendEvent>> m_sendListV2;
@@ -210,12 +214,12 @@ void EventReassemblyComponentImpl::SetSink(EventReassemblySink* sink)
 void EventReassemblyComponentImpl::RegisterTarget(const int id, const uint8_t maxPendingEvents)
 {
 	std::unique_lock lock(m_listMutex);
-	m_targets[id] = Target{id, maxPendingEvents};
+	m_targets[id] = Target{ id, maxPendingEvents };
 }
 
 void EventReassemblyComponentImpl::UnregisterSendList(int target, std::unordered_map<EventId, std::shared_ptr<SendEvent>>& sendList)
 {
-	for (auto& [ _, sendPacket ] : sendList)
+	for (auto& [_, sendPacket] : sendList)
 	{
 		sendPacket->targetData.erase(target);
 		sendPacket->targets.erase(target);
@@ -229,7 +233,7 @@ void EventReassemblyComponentImpl::UnregisterTarget(const int id)
 	if (m_targets.find(id) != m_targets.end())
 	{
 		m_targets.erase(id);
-		
+
 		// drop any sends/receives from this target
 		m_receiveList.erase(id);
 
@@ -238,6 +242,7 @@ void EventReassemblyComponentImpl::UnregisterTarget(const int id)
 	}
 }
 
+#ifndef IS_FXSERVER
 void EventReassemblyComponentImpl::TriggerEvent(const int target, const std::string_view eventName, const std::string_view eventPayload, int bytesPerSecond)
 {
 	// default BPS if it's 0/negative so we won't end up with weird calculation artifacts later on
@@ -258,14 +263,11 @@ void EventReassemblyComponentImpl::TriggerEvent(const int target, const std::str
 	if (bytesPerSecond >= 10000000 && eventPayload.size() >= 50000000)
 	{
 		auto timeNow = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
-		static std::chrono::milliseconds lastWarning{0};
+		static std::chrono::milliseconds lastWarning{ 0 };
 		if (timeNow - lastWarning >= std::chrono::seconds(5))
 		{
-#if IS_FXSERVER
-			StructuredTrace({ "type", "large_event_warning" }, { "event_type", "latent" }, { "event_name", eventName }, { "event_size", eventPayload.size() }, { "event_bps", bytesPerSecond });
-#endif
 			trace("Warning: sending large event %s (%u bytes) with almost unrestricted bitrate (%u b/s). This may cause performance issues. Consider decreasing objects sizes or bitrate.\n",
-				eventName, eventPayload.size(), bytesPerSecond);
+			eventName, eventPayload.size(), bytesPerSecond);
 			lastWarning = timeNow;
 		}
 	}
@@ -275,7 +277,7 @@ void EventReassemblyComponentImpl::TriggerEvent(const int target, const std::str
 	if (target == -1)
 	{
 		std::shared_lock _(m_listMutex);
-		for(const auto& currTarget: m_targets)
+		for (const auto& currTarget : m_targets)
 		{
 			targets.insert(currTarget.first);
 		}
@@ -323,6 +325,7 @@ void EventReassemblyComponentImpl::TriggerEvent(const int target, const std::str
 	std::unique_lock lock(m_listMutex);
 	m_sendList.insert({ m_eventId++, sendPacket });
 }
+#endif
 
 void EventReassemblyComponentImpl::TriggerEventV2(const int target, std::string_view eventName, std::string_view eventPayload, int bytesPerSecond)
 {
@@ -344,14 +347,14 @@ void EventReassemblyComponentImpl::TriggerEventV2(const int target, std::string_
 	if (bytesPerSecond >= 10000000 && eventPayload.size() >= 50000000)
 	{
 		auto timeNow = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
-		static std::chrono::milliseconds lastWarning{0};
+		static std::chrono::milliseconds lastWarning{ 0 };
 		if (timeNow - lastWarning >= std::chrono::seconds(5))
 		{
 #if IS_FXSERVER
 			StructuredTrace({ "type", "large_event_warning" }, { "event_type", "latent" }, { "event_name", eventName }, { "event_size", eventPayload.size() }, { "event_bps", bytesPerSecond });
 #endif
 			trace("Warning: sending large event %s (%u bytes) with almost unrestricted bitrate (%u b/s). This may cause performance issues. Consider decreasing objects sizes or bitrate.\n",
-				eventName, eventPayload.size(), bytesPerSecond);
+			eventName, eventPayload.size(), bytesPerSecond);
 			lastWarning = timeNow;
 		}
 	}
@@ -361,7 +364,7 @@ void EventReassemblyComponentImpl::TriggerEventV2(const int target, std::string_
 	if (target == -1)
 	{
 		std::shared_lock _(m_listMutex);
-		for(const auto& currTarget: m_targets)
+		for (const auto& currTarget : m_targets)
 		{
 			targets.insert(currTarget.first);
 		}
@@ -383,7 +386,7 @@ void EventReassemblyComponentImpl::TriggerEventV2(const int target, std::string_
 	sendPacket->targets = targets;
 	sendPacket->sendPayload.resize(eventName.size() + sizeof(uint16_t) + eventPayload.size());
 
-	net::ByteWriter writer {sendPacket->sendPayload.data(), sendPacket->sendPayload.size()};
+	net::ByteWriter writer{ sendPacket->sendPayload.data(), sendPacket->sendPayload.size() };
 	uint16_t eventNameSize = static_cast<uint16_t>(eventName.size());
 	writer.Field(eventNameSize);
 	writer.Field(eventName, eventNameSize);
@@ -416,6 +419,11 @@ void EventReassemblyComponentImpl::TriggerEventV2(const int target, std::string_
 /// <param name="event">ReceiveEvent that contains the infos about the packet to receive. It contains the map of packets to reassemble which should be complete now</param>
 void EventReassemblyComponentImpl::HandleReceivedPacket(int source, const std::shared_ptr<ReceiveEvent>& event, uint32_t fragmentSize, const bool v2)
 {
+	if (m_sink->LimitEvent(source))
+	{
+		return;
+	}
+
 	// reassemble the buffer
 	std::vector<uint8_t> eventPayload(event->ackedBits.size() * fragmentSize);
 	size_t readSize = 0;
@@ -438,10 +446,17 @@ void EventReassemblyComponentImpl::HandleReceivedPacket(int source, const std::s
 	std::string data;
 	if (v2)
 	{
-		net::ByteReader reader {eventPayload.data(), readSize};
+		net::ByteReader reader{ eventPayload.data(), readSize };
 		uint16_t nameLength;
 		reader.Field(nameLength);
 		reader.Field(name, nameLength);
+
+		// Strip trailing null terminator if present (much older clients include it in the length)
+		if (!name.empty() && name.back() == '\0')
+		{
+			name = name.substr(0, name.size() - 1);
+		}
+
 		reader.Field(data, reader.GetRemaining());
 	}
 	else
@@ -452,11 +467,10 @@ void EventReassemblyComponentImpl::HandleReceivedPacket(int source, const std::s
 		buffer.ReadBits(eventName, nameLength * 8);
 		eventName[nameLength] = '\0';
 
-		name = {eventName, static_cast<size_t>(nameLength - 1)};
+		name = { eventName, static_cast<size_t>(nameLength - 1) };
 		data = std::string(std::string_view{
-			reinterpret_cast<const char*>(buffer.GetBuffer().data() + (buffer.GetCurrentBit() / 8)),
-			buffer.GetBuffer().size() - (buffer.GetCurrentBit() / 8)
-		});
+		reinterpret_cast<const char*>(buffer.GetBuffer().data() + (buffer.GetCurrentBit() / 8)),
+		buffer.GetBuffer().size() - (buffer.GetCurrentBit() / 8) });
 	}
 
 	// convert the source net ID to a string
@@ -465,24 +479,18 @@ void EventReassemblyComponentImpl::HandleReceivedPacket(int source, const std::s
 	// get the resource manager and eventing component
 	fwRefContainer<fx::ResourceEventManagerComponent> eventManager = m_resourceManager->GetComponent<fx::ResourceEventManagerComponent>();
 
-	if (m_sink->LimitEvent(source))
-	{
-		return;
-	}
-
 	// and queue the event
 	eventManager->QueueEvent(
-		std::string(name),
-		data,
-		sourceStr
-	);
+	std::string(name),
+	data,
+	sourceStr);
 }
 
 void EventReassemblyComponentImpl::NetworkTickSendList(const std::chrono::milliseconds& timeNow, const std::chrono::milliseconds& dT, std::unordered_map<EventId, std::shared_ptr<SendEvent>>& sendList, const uint32_t fragmentSize, const bool v2)
 {
 	std::set<EventId> dones;
 
-	for (auto& [ eventId, sendPacket ] : sendList)
+	for (auto& [eventId, sendPacket] : sendList)
 	{
 		double pps = (sendPacket->bytesPerSecond / static_cast<double>(fragmentSize));
 		std::chrono::milliseconds latency{ static_cast<uint64_t>(1000 / pps) };
@@ -567,7 +575,7 @@ void EventReassemblyComponentImpl::NetworkTickSendList(const std::chrono::millis
 							size_t offset = (packetIdx * fragmentSize);
 							size_t size = std::min(sendPacket->sendPayload.size() - offset, static_cast<size_t>(fragmentSize));
 
-							packet.data.data.SetValue({sendPacket->sendPayload.data() + offset, size});
+							packet.data.data.SetValue({ sendPacket->sendPayload.data() + offset, size });
 							m_sink->SendPacketV2(target, packet);
 						}
 						else
@@ -679,6 +687,7 @@ void EventReassemblyComponentImpl::NetworkTick()
 /// <param name="data">The packet data we received</param>
 void EventReassemblyComponentImpl::HandlePacket(int source, std::string_view data)
 {
+#ifndef IS_FXSERVER
 	rl::MessageBufferView buffer(net::Span<uint8_t>(const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(data.data())), static_cast<size_t>(data.size())));
 
 	EventPacket packet;
@@ -693,6 +702,11 @@ void EventReassemblyComponentImpl::HandlePacket(int source, std::string_view dat
 		return;
 	}
 
+	if (packet.packetIdx >= packet.totalPackets)
+	{
+		return;
+	}
+
 	if (packet.IsAck())
 	{
 		// received a ack packet to indicate the remote side received a payload packet
@@ -703,7 +717,7 @@ void EventReassemblyComponentImpl::HandlePacket(int source, std::string_view dat
 			std::shared_ptr<SendEvent> sendData = entryIt->second;
 
 			auto targetDataIt = sendData->targetData.find(source);
-			
+
 			if (targetDataIt != sendData->targetData.end() && targetDataIt->second)
 			{
 				auto& ackBits = targetDataIt->second->ackBits;
@@ -728,7 +742,7 @@ void EventReassemblyComponentImpl::HandlePacket(int source, std::string_view dat
 			std::unordered_map<EventId, std::shared_ptr<ReceiveEvent>>* clientReceiveMap;
 			if (clientIt == m_receiveList.end())
 			{
-				clientReceiveMap = &m_receiveList.insert({source, std::unordered_map<EventId, std::shared_ptr<ReceiveEvent>>{}}).first->second;
+				clientReceiveMap = &m_receiveList.insert({ source, std::unordered_map<EventId, std::shared_ptr<ReceiveEvent>>{} }).first->second;
 			}
 			else
 			{
@@ -748,18 +762,18 @@ void EventReassemblyComponentImpl::HandlePacket(int source, std::string_view dat
 
 				switch (target->second.maxPendingEvents)
 				{
-				case 0:
-					// more then maxPendingEvents are not accepted at the same time
+					case 0:
+						// more then maxPendingEvents are not accepted at the same time
 						return;
-				case 0xFF:
-					// when maxPendingEvents is set to 255 the target has infinite amount of events
+					case 0xFF:
+						// when maxPendingEvents is set to 255 the target has infinite amount of events
 						// used on the client side for the remote server
-							break;
-				default:
-					--target->second.maxPendingEvents;	
-					break;
+						break;
+					default:
+						--target->second.maxPendingEvents;
+						break;
 				}
-			
+
 				// started receiving a new event from remote
 				receiveData = std::make_shared<ReceiveEvent>();
 				// the remote defines the amount of packets that the event will be split to
@@ -768,7 +782,7 @@ void EventReassemblyComponentImpl::HandlePacket(int source, std::string_view dat
 				receiveData->completed = false;
 				receiveData->timeLastAck = std::chrono::milliseconds{ 0 };
 
-				clientReceiveMap->insert({packet.eventId, receiveData});
+				clientReceiveMap->insert({ packet.eventId, receiveData });
 			}
 			else
 			{
@@ -778,14 +792,20 @@ void EventReassemblyComponentImpl::HandlePacket(int source, std::string_view dat
 
 			// note down as acked
 			auto& ackBits = receiveData->ackedBits;
+
+			if (packet.totalPackets != ackBits.size())
+			{
+				return;
+			}
+
 			// packetIdx (0, ackBitsSize] is the relative index of the packet inside the event to receive
-			bool ackedPacket = (packet.packetIdx < ackBits.size()) ? ackBits[packet.packetIdx] : false;
+			bool ackedPacket = ackBits[packet.packetIdx];
 
 			// Event has already been completed or acked: just send an ACK.
 			if (receiveData->source == source && (receiveData->completed || ackedPacket))
 			{
 				// TODO: why allocate a std::vector with 1536 byte when this has a maximum of 108 bit
-			
+
 				uint8_t buf[1536];
 				rl::MessageBufferView view(net::Span<uint8_t>(buf, 1536));
 				// thisBytes = 0 makes sure the receive ack to remote does not repeat the packet payload and only the meta data.
@@ -799,12 +819,7 @@ void EventReassemblyComponentImpl::HandlePacket(int source, std::string_view dat
 			// receiveData->source == source is always true
 			else if (receiveData->source == source)
 			{
-				// check to prevent overflow of the ack bitset
-				// but the relative index of the event packet should always be below, otherwise its invalid data
-				if (packet.packetIdx < ackBits.size())
-				{
-					ackBits.set(packet.packetIdx, true);
-				}
+				ackBits.set(packet.packetIdx, true);
 
 				// copy the payload from the packet to our ReceiveEvent to assemble it when all data is received
 				{
@@ -860,7 +875,7 @@ void EventReassemblyComponentImpl::HandlePacket(int source, std::string_view dat
 
 					// Cleanup will now happen in NetworkTick to prevent any lingering packets from recreating
 					// the ReceiveEvent.
-					//m_receiveList.erase({ source, packet.eventId });
+					// m_receiveList.erase({ source, packet.eventId });
 				}
 			}
 		}
@@ -870,6 +885,7 @@ void EventReassemblyComponentImpl::HandlePacket(int source, std::string_view dat
 			HandleReceivedPacket(source, receiveData, net::packet::ReassembledEvent::kFragmentSize);
 		}
 	}
+#endif
 }
 
 /// <summary>
@@ -885,6 +901,11 @@ void EventReassemblyComponentImpl::HandlePacketV2(int source, const net::packet:
 		return;
 	}
 
+	if (packet.packetIdx >= packet.totalPackets)
+	{
+		return;
+	}
+
 	if (packet.IsAck())
 	{
 		// received a ack packet to indicate the remote side received a payload packet
@@ -895,7 +916,7 @@ void EventReassemblyComponentImpl::HandlePacketV2(int source, const net::packet:
 			std::shared_ptr<SendEvent> sendData = entryIt->second;
 
 			auto targetDataIt = sendData->targetData.find(source);
-			
+
 			if (targetDataIt != sendData->targetData.end() && targetDataIt->second)
 			{
 				auto& ackBits = targetDataIt->second->ackBits;
@@ -920,7 +941,7 @@ void EventReassemblyComponentImpl::HandlePacketV2(int source, const net::packet:
 			std::unordered_map<EventId, std::shared_ptr<ReceiveEvent>>* clientReceiveMap;
 			if (clientIt == m_receiveList.end())
 			{
-				clientReceiveMap = &m_receiveList.insert({source, std::unordered_map<EventId, std::shared_ptr<ReceiveEvent>>{}}).first->second;
+				clientReceiveMap = &m_receiveList.insert({ source, std::unordered_map<EventId, std::shared_ptr<ReceiveEvent>>{} }).first->second;
 			}
 			else
 			{
@@ -940,18 +961,18 @@ void EventReassemblyComponentImpl::HandlePacketV2(int source, const net::packet:
 
 				switch (target->second.maxPendingEvents)
 				{
-				case 0:
-					// more then maxPendingEvents are not accepted at the same time
+					case 0:
+						// more then maxPendingEvents are not accepted at the same time
 						return;
-				case 0xFF:
-					// when maxPendingEvents is set to 255 the target has infinite amount of events
+					case 0xFF:
+						// when maxPendingEvents is set to 255 the target has infinite amount of events
 						// used on the client side for the remote server
-							break;
-				default:
-					--target->second.maxPendingEvents;	
-					break;
+						break;
+					default:
+						--target->second.maxPendingEvents;
+						break;
 				}
-			
+
 				// started receiving a new event from remote
 				receiveData = std::make_shared<ReceiveEvent>();
 				// the remote defines the amount of packets that the event will be split to
@@ -960,7 +981,7 @@ void EventReassemblyComponentImpl::HandlePacketV2(int source, const net::packet:
 				receiveData->completed = false;
 				receiveData->timeLastAck = std::chrono::milliseconds{ 0 };
 
-				clientReceiveMap->insert({packet.eventId, receiveData});
+				clientReceiveMap->insert({ packet.eventId, receiveData });
 			}
 			else
 			{
@@ -970,8 +991,14 @@ void EventReassemblyComponentImpl::HandlePacketV2(int source, const net::packet:
 
 			// note down as acked
 			auto& ackBits = receiveData->ackedBits;
+
+			if (packet.totalPackets != ackBits.size() )
+			{
+				return;
+			}
+
 			// packetIdx (0, ackBitsSize] is the relative index of the packet inside the event to receive
-			bool ackedPacket = (packet.packetIdx < ackBits.size()) ? ackBits[packet.packetIdx] : false;
+			bool ackedPacket = ackBits[packet.packetIdx];
 
 			// Event has already been completed or acked: just send an ACK.
 			if (receiveData->source == source && (receiveData->completed || ackedPacket))
@@ -987,12 +1014,8 @@ void EventReassemblyComponentImpl::HandlePacketV2(int source, const net::packet:
 			// receiveData->source == source is always true
 			else if (receiveData->source == source)
 			{
-				// check to prevent overflow of the ack bitset
-				// but the relative index of the event packet should always be below, otherwise its invalid data
-				if (packet.packetIdx < ackBits.size())
-				{
-					ackBits.set(packet.packetIdx, true);
-				}
+
+				ackBits.set(packet.packetIdx, true);
 
 				// copy the payload from the packet to our ReceiveEvent to assemble it when all data is received
 				{
@@ -1045,7 +1068,7 @@ void EventReassemblyComponentImpl::HandlePacketV2(int source, const net::packet:
 
 					// Cleanup will now happen in NetworkTick to prevent any lingering packets from recreating
 					// the ReceiveEvent.
-					//m_receiveList.erase({ source, packet.eventId });
+					// m_receiveList.erase({ source, packet.eventId });
 				}
 			}
 		}

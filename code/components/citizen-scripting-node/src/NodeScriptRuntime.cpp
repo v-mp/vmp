@@ -151,6 +151,18 @@ const std::string_view& resource)
 
 		fwRefContainer<vfs::Device> device = !res.empty() && res[0] == '@' ? vfs::GetDevice(res) : nullptr;
 		std::string path = res;
+
+		// Handle VFS scheme paths (e.g., "citizen:/scripting/v8/main.js") that may
+		// reach Node's fs layer directly
+		if (!device.GetRef())
+		{
+			auto colonSlashPos = res.find(":/");
+			if (colonSlashPos != std::string::npos && colonSlashPos > 0 && (res.find('/') == std::string::npos || colonSlashPos < res.find('/')))
+			{
+				device = vfs::GetDevice(res);
+			}
+		}
+
 		if (!device.GetRef())
 		{
 			std::string absolutePath = std::filesystem::absolute(std::filesystem::path(path)).string();
@@ -266,6 +278,7 @@ static std::pair<std::string, v8::FunctionCallback> g_citizenFunctions[] = {
 	{ "setUnhandledPromiseRejectionFunction", V8_SetUnhandledPromiseRejectionRoutine<NodeScriptRuntime> },
 	{ "getTickCount", V8_GetTickCount },
 	{ "getResourcePath", V8_GetResourcePath<NodeScriptRuntime> },
+	{ "getResourceTempPath", V8_GetResourceTempPath<NodeScriptRuntime> },
 
 	// ref stuff
 	{ "setCallRefFunction", V8_SetCallRefFunction<NodeScriptRuntime> },
@@ -387,7 +400,10 @@ result_t NodeScriptRuntime::Create(IScriptHost* host)
 
 	m_isMonitorRuntime = resourceManager->IsMonitor();
 
-	// create our UV loo
+	// per-resource temp directory path (created lazily when os.tmpdir() is called)
+	m_tempDir = std::filesystem::absolute(std::filesystem::path(resource->GetPath()) / ".tmp").string();
+
+	// create our UV loop
 	m_uvLoop = new uv_loop_t;
 	uv_loop_init(m_uvLoop);
 
@@ -524,6 +540,14 @@ result_t NodeScriptRuntime::Destroy()
 	delete m_uvLoop;
 
 	m_context.Reset();
+
+	// clean up the per-resource temp directory
+	if (!m_tempDir.empty())
+	{
+		std::error_code ec;
+		std::filesystem::remove_all(m_tempDir, ec);
+	}
+
 	return FX_S_OK;
 }
 
@@ -647,7 +671,32 @@ result_t NodeScriptRuntime::LoadHostFileInternal(char* scriptFile, v8::Local<v8:
 	char* resourceName;
 	m_resourceHost->GetResourceName(&resourceName);
 
-	return LoadFileInternal(stream, (scriptFile[0] != '@') ? const_cast<char*>(fmt::sprintf("@%s/%s", resourceName, scriptFile).c_str()) : scriptFile, outScript);
+	// Resolve VFS scheme paths (e.g., "citizen:/scripting/v8/main.js") to real filesystem
+	// paths before passing them as script names to V8. This prevents Node.js from
+	// misinterpreting scheme paths as relative filesystem paths and triggering fs.open
+	// with mangled paths that fail the permission check.
+	std::string scriptName(scriptFile);
+	auto colonSlashPos = scriptName.find(":/");
+	if (colonSlashPos != std::string::npos && colonSlashPos > 0 && (scriptName.find('/') == std::string::npos || colonSlashPos < scriptName.find('/')))
+	{
+		fwRefContainer<vfs::Device> device = vfs::GetDevice(scriptName);
+		if (device.GetRef())
+		{
+			std::string absPath = device->GetAbsolutePath();
+			if (!absPath.empty())
+			{
+				// Construct the resolved path: device's absolute path + relative portion after ":/"
+				scriptName = absPath + scriptName.substr(colonSlashPos + 2);
+			}
+		}
+	}
+
+	if (scriptFile[0] != '@' && scriptName == scriptFile)
+	{
+		scriptName = fmt::sprintf("@%s/%s", resourceName, scriptFile);
+	}
+
+	return LoadFileInternal(stream, const_cast<char*>(scriptName.c_str()), outScript);
 }
 
 result_t NodeScriptRuntime::RunFileInternal(char* scriptName, std::function<result_t(char*, v8::Local<v8::Script>*)> loadFunction)

@@ -30,6 +30,8 @@ static constexpr const size_t kGamePlayerCap =
 #include <variant>
 
 #include <EASTL/bitset.h>
+#include <EASTL/algorithm.h>
+#include <EASTL/sort.h>
 #include <EASTL/deque.h>
 #include <EASTL/fixed_map.h>
 #include <EASTL/fixed_hash_map.h>
@@ -51,14 +53,14 @@ static constexpr const size_t kGamePlayerCap =
 #include <net/NetObjEntityType.h>
 
 #ifdef STATE_FIVE
-// For GTA5, if the feature flag for new build system is set, we use the latest stable build executable even if lower version is enforced.
-// The different sv_enforceGameBuild behaviors is achieved on the client side by loading different DLC sets with IsDlcIncludedInBuild.
+// We always use the latest stable build executable. The different sv_enforceGameBuild behaviors
+// are achieved on the client side by loading different DLC sets with IsDlcIncludedInBuild.
 
 inline bool Is2060()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 2060) || fx::GetEnforcedGameBuildNumber() >= 2060;
+		return xbr::GetDefaultGTA5Executable() >= 2060 || fx::GetEnforcedGameBuildNumber() >= 2060;
 	})();
 
 	return value;
@@ -68,7 +70,7 @@ inline bool Is2189()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 2189) || fx::GetEnforcedGameBuildNumber() >= 2189;
+		return xbr::GetDefaultGTA5Executable() >= 2189 || fx::GetEnforcedGameBuildNumber() >= 2189;
 	})();
 
 	return value;
@@ -78,7 +80,7 @@ inline bool Is2372()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 2372) || fx::GetEnforcedGameBuildNumber() >= 2372;
+		return xbr::GetDefaultGTA5Executable() >= 2372 || fx::GetEnforcedGameBuildNumber() >= 2372;
 	})();
 
 	return value;
@@ -88,7 +90,7 @@ inline bool Is2545()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 2545) || fx::GetEnforcedGameBuildNumber() >= 2545;
+		return xbr::GetDefaultGTA5Executable() >= 2545 || fx::GetEnforcedGameBuildNumber() >= 2545;
 	})();
 
 	return value;
@@ -98,7 +100,7 @@ inline bool Is2612()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 2612) || fx::GetEnforcedGameBuildNumber() >= 2612;
+		return xbr::GetDefaultGTA5Executable() >= 2612 || fx::GetEnforcedGameBuildNumber() >= 2612;
 	})();
 
 	return value;
@@ -108,7 +110,7 @@ inline bool Is2699()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 2699) || fx::GetEnforcedGameBuildNumber() >= 2699;
+		return xbr::GetDefaultGTA5Executable() >= 2699 || fx::GetEnforcedGameBuildNumber() >= 2699;
 	})();
 
 	return value;
@@ -118,7 +120,7 @@ inline bool Is2802()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 2802) || fx::GetEnforcedGameBuildNumber() >= 2802;
+		return xbr::GetDefaultGTA5Executable() >= 2802 || fx::GetEnforcedGameBuildNumber() >= 2802;
 	})();
 
 	return value;
@@ -128,7 +130,7 @@ inline bool Is2944()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 2944) || fx::GetEnforcedGameBuildNumber() >= 2944;
+		return xbr::GetDefaultGTA5Executable() >= 2944 || fx::GetEnforcedGameBuildNumber() >= 2944;
 	})();
 
 	return value;
@@ -138,7 +140,7 @@ inline bool Is3095()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 3095) || fx::GetEnforcedGameBuildNumber() >= 3095;
+		return xbr::GetDefaultGTA5Executable() >= 3095 || fx::GetEnforcedGameBuildNumber() >= 3095;
 	})();
 
 	return value;
@@ -148,7 +150,7 @@ inline bool Is3258()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 3258) || fx::GetEnforcedGameBuildNumber() >= 3258;
+		return xbr::GetDefaultGTA5Executable() >= 3258 || fx::GetEnforcedGameBuildNumber() >= 3258;
 	})();
 
 	return value;
@@ -158,7 +160,7 @@ inline bool Is3323()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 3323) || fx::GetEnforcedGameBuildNumber() >= 3323;
+		return xbr::GetDefaultGTA5Executable() >= 3323 || fx::GetEnforcedGameBuildNumber() >= 3323;
 	})();
 
 	return value;
@@ -168,7 +170,7 @@ inline bool Is3407()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 3407) || fx::GetEnforcedGameBuildNumber() >= 3407;
+		return xbr::GetDefaultGTA5Executable() >= 3407 || fx::GetEnforcedGameBuildNumber() >= 3407;
 	})();
 
 	return value;
@@ -178,7 +180,7 @@ inline bool IsSummerUpdate25()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= xbr::Build::Summer_2025) || fx::GetEnforcedGameBuildNumber() >= xbr::Build::Summer_2025;
+		return xbr::GetDefaultGTA5Executable() >= xbr::Build::Summer_2025 || fx::GetEnforcedGameBuildNumber() >= xbr::Build::Summer_2025;
 	})();
 
 	return value;
@@ -188,7 +190,7 @@ inline bool IsWinterUpdate25()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= 3717) || fx::GetEnforcedGameBuildNumber() >= 3717;
+		return xbr::GetDefaultGTA5Executable() >= 3717 || fx::GetEnforcedGameBuildNumber() >= 3717;
 	})();
 
 	return value;
@@ -198,7 +200,7 @@ inline bool IsPatch2026_1()
 {
 	static bool value = ([]()
 	{
-		return (!fx::GetReplaceExecutable() && xbr::GetDefaultGTA5Build() >= xbr::Build::Patch_2026_1) || fx::GetEnforcedGameBuildNumber() >= xbr::Build::Patch_2026_1;
+		return xbr::GetDefaultGTA5Executable() >= xbr::Build::Patch_2026_1 || fx::GetEnforcedGameBuildNumber() >= xbr::Build::Patch_2026_1;
 	})();
 
 	return value;
@@ -1278,17 +1280,67 @@ struct EntityDeletionData
 	bool forceSteal; // should we force a steal from the client?
 };
 
-struct ClientEntityState
+class ClientEntityState
 {
-#ifdef _WIN32
-	eastl::vector_map<uint16_t, ClientEntityData, std::less<uint16_t>, EASTLAllocatorType, eastl::deque<eastl::pair<uint16_t, ClientEntityData>, EASTLAllocatorType>> syncedEntities;
-#else
-	// on Linux/Clang/libstdc++/dunno the above vector_map leads to very rare corruption under high load
-	eastl::fixed_map<uint16_t, ClientEntityData, 192> syncedEntities;
-#endif
-
+public:
 	// and 24 deletions per frame
 	eastl::fixed_vector<std::tuple<uint32_t, EntityDeletionData>, 24> deletions;
+	
+	void Insert(uint16_t handle, ClientEntityData clientEntityData)
+	{
+		syncedEntities.emplace_back(handle, clientEntityData);
+	}
+	
+	void Sort()
+	{
+		eastl::sort(syncedEntities.begin(), syncedEntities.end(), [](const auto& lhs, const auto& rhs)
+		{
+			return lhs.first < rhs.first;
+		});
+	}
+	
+	ClientEntityData* GetClientEntityData(uint16_t id)
+	{
+		auto it = eastl::lower_bound(syncedEntities.begin(), syncedEntities.end(), id, [](const auto& entry, uint16_t value)
+		{
+			return entry.first < value;
+		});
+
+		if (it != syncedEntities.end() && it->first == id)
+		{
+			return &it->second;
+		}
+
+		return nullptr;
+	}
+	
+	const ClientEntityData* GetClientEntityData(uint16_t id) const
+	{
+		auto it = eastl::lower_bound(syncedEntities.begin(), syncedEntities.end(), id, [](const auto& entry, uint16_t value)
+		{
+			return entry.first < value;
+		});
+
+		if (it != syncedEntities.end() && it->first == id)
+		{
+			return &it->second;
+		}
+
+		return nullptr;
+	}
+	
+	eastl::vector<eastl::pair<uint16_t, ClientEntityData>>& GetSyncedEntities()
+	{
+		return syncedEntities;
+	}
+	
+	const eastl::vector<eastl::pair<uint16_t, ClientEntityData>>& GetSyncedEntities() const
+	{
+		return syncedEntities;
+	}
+
+private:
+	eastl::vector<eastl::pair<uint16_t, ClientEntityData>> syncedEntities;
 };
 
 struct SyncedEntityData

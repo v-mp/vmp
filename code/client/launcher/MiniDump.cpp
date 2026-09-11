@@ -34,6 +34,7 @@ using namespace google_breakpad;
 
 #include <json.hpp>
 
+#include <random>
 #include <regex>
 #include <sstream>
 
@@ -426,6 +427,12 @@ static void OverloadCrashData(TASKDIALOGCONFIG* config)
 	{
 		blame = L"NVIDIA GPU drivers";
 		blame_two = L"Please try updating your NVIDIA drivers, restarting your PC and then starting the game again.";
+	}
+
+	if (wcsstr(crashHash.c_str(), L"nvppex"))
+	{
+		blame = L"NVIDIA Game Filters (nvppex.dll)";
+		blame_two = L"Please disable NVIDIA Game Filters (Freestyle) in the NVIDIA App and restart the game.";
 	}
 
 	if (wcsstr(crashHash.c_str(), L"guard64"))
@@ -826,6 +833,59 @@ static LPTHREAD_START_ROUTINE GetFunc(HANDLE hProcess, const char* name)
 extern nlohmann::json SymbolicateCrash(HANDLE hProcess, HANDLE hThread, PEXCEPTION_RECORD er, PCONTEXT ctx);
 extern void ParseSymbolicCrash(nlohmann::json& crash, std::string* signature, std::string* stackTrace);
 
+static void PruneCrashDumps()
+{
+	auto crashDirectory = MakeRelativeCitPath(L"crashes");
+	constexpr size_t kMaxDumps = 10;
+
+	std::vector<std::pair<FILETIME, std::wstring>> dumpFiles;
+
+	WIN32_FIND_DATAW findData;
+	HANDLE hFind = FindFirstFileW((crashDirectory + L"\\*.dmp").c_str(), &findData);
+
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		return;
+	}
+
+	do
+	{
+		std::wstring fileName = findData.cFileName;
+
+		// skip -full.dmp files, they are cleaned up alongside their parent
+		if (fileName.size() > 9 && fileName.substr(fileName.size() - 9) == L"-full.dmp")
+		{
+			continue;
+		}
+
+		dumpFiles.emplace_back(findData.ftCreationTime, crashDirectory + L"\\" + fileName);
+	} while (FindNextFileW(hFind, &findData));
+
+	FindClose(hFind);
+
+	if (dumpFiles.size() <= kMaxDumps)
+	{
+		return;
+	}
+
+	// sort by creation time, newest first
+	std::sort(dumpFiles.begin(), dumpFiles.end(), [](const auto& a, const auto& b)
+	{
+		return CompareFileTime(&a.first, &b.first) > 0;
+	});
+
+	for (size_t i = kMaxDumps; i < dumpFiles.size(); i++)
+	{
+		const auto& path = dumpFiles[i].second;
+		DeleteFileW(path.c_str());
+
+		// also remove associated files
+		auto basePath = path.substr(0, path.size() - 4); // strip .dmp
+		DeleteFileW((basePath + L"-full.dmp").c_str());
+		DeleteFileW((path + L".gamelog").c_str());
+	}
+}
+
 void InitializeDumpServer(int inheritedHandle, int parentPid)
 {
 	static bool g_running = true;
@@ -857,6 +917,8 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 
 	CrashGenerationServer::OnClientDumpRequestCallback dumpCallback = [] (void*, const ClientInfo* info, const std::wstring* filePath)
 	{
+		PruneCrashDumps();
+
 		// we're going to be reporting, make a new event
 		auto crashReportIdx = InterlockedIncrement(&numCrashReports) - 1;
 		HANDLE crashReport = NULL;
@@ -1293,6 +1355,19 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 				bool shouldTerminate = true;
 				bool shouldUpload = true;
 
+				{
+					// 5% chance to upload
+					std::random_device rd;
+					std::uniform_int_distribution<int> dist(0, 99);
+					shouldUpload = dist(rd) < 5;
+
+					auto errorPickup = load_error_pickup();
+					if (!errorPickup.is_null() && errorPickup.contains("no_upload") && errorPickup["no_upload"].get<bool>())
+					{
+						shouldUpload = false;
+					}
+				}
+
 				if (GetProcessId(parentProcess) != GetProcessId(process_handle))
 				{
 					wchar_t imageName[MAX_PATH];
@@ -1506,7 +1581,10 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 
 					g_session["status"] = "crashed";
 
-					UpdateSession(g_session);
+					if (shouldUpload)
+					{
+						UpdateSession(g_session);
+					}
 				}
 
 				uploadError = false;
@@ -1692,6 +1770,7 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 				parameters[L"Fatal"] = (shouldTerminate) ? L"true" : L"false";
 
 				// upload the actual minidump file as well
+#define CFX_CRASH_INGRESS_URL "https://crash-ingress.fivem.net"
 #if defined(CFX_CRASH_INGRESS_URL) && (defined(GTA_FIVE) || defined(IS_RDR3))
 				if (uploadCrashes && shouldUpload && HTTPUpload::SendMultipartPostRequest(va(L"%s/post", ToWide(CFX_CRASH_INGRESS_URL)), parameters, files, &timeout, &responseBody, &responseCode))
 				{

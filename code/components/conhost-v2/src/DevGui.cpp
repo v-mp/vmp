@@ -247,7 +247,7 @@ static InitFunction initFunction([]()
 	});
 
 #ifndef IS_FXSERVER
-	static ConVar<std::string> uiConnectHost("uiConnectHost", ConVar_Archive, "");
+	static ConVar<std::string> uiConnectHost("uiConnectHost", ConVar_Archive | ConVar_UserPref, "");
 
 	static ConsoleCommand uiConnect("uiConnect", []()
 	{
@@ -290,6 +290,7 @@ devgui_convar "Tools/Streaming/Streaming Stats" strdbg
 devgui_convar "Tools/Streaming/Streaming List" strlist
 devgui_convar "Tools/Streaming/Pool Monitor" net_showPools
 devgui_convar "Tools/Streaming/pgRawStreamer assets" net_pgStats
+devgui_convar "Tools/Streaming/Scene Graph Pools" sceneGraphPools
 devgui_convar "Tools/Network/OneSync/Network Object Viewer" netobjviewer
 devgui_convar "Tools/Network/OneSync/Network SyncLog" netobjviewer_syncLog
 devgui_convar "Tools/Network/OneSync/Network Time" net_showTime

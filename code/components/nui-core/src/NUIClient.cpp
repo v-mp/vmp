@@ -30,6 +30,41 @@ bool shouldHaveRootWindow;
 
 static nui::IAudioSink* g_audioSink;
 
+static bool IsTrustedEntitlementFrame(const std::string& frameUrl)
+{
+	static ConVar<std::string> uiUrlVar("ui_url", ConVar_UserPref, "https://nui-game-internal/ui/app/index.html");
+	if (boost::algorithm::starts_with(frameUrl, uiUrlVar.GetValue()))
+	{
+		return true;
+	}
+
+	if (frameUrl.empty())
+	{
+		return false;
+	}
+
+	CefURLParts urlParts;
+	if (!CefParseURL(frameUrl, urlParts))
+	{
+		return false;
+	}
+
+	auto scheme = boost::algorithm::to_lower_copy(CefString(&urlParts.scheme).ToString());
+	auto host = boost::algorithm::to_lower_copy(CefString(&urlParts.host).ToString());
+
+	if (scheme == "nui")
+	{
+		return (host == "game" || host == "nui-game-internal");
+	}
+
+	if (scheme == "https")
+	{
+		return (host == "nui-game-internal");
+	}
+
+	return false;
+}
+
 namespace nui
 {
 	void SetAudioSink(IAudioSink* sinkRef)
@@ -452,6 +487,15 @@ auto NUIClient::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<Ce
 	}
 
 	return RV_CONTINUE;
+}
+
+CefRefPtr<CefResourceHandler> NUIClient::GetResourceHandler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request)
+{
+	CefRefPtr<CefResourceHandler> handler;
+
+	OnGetResourceHandler(browser, frame, request, handler);
+
+	return handler;
 }
 
 void NUIClient::AddProcessMessageHandler(std::string key, TProcessMessageHandler handler)

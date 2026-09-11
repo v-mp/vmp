@@ -53,8 +53,9 @@
 
 #include <HttpClient.h>
 
-#include "CnlEndpoint.h"
+#include <StructuredTrace.h>
 
+#include "CnlEndpoint.h"
 using json = nlohmann::json;
 
 static std::forward_list<fx::ServerIdentityProviderBase*> g_serverProviders;
@@ -379,7 +380,6 @@ std::optional<TicketData> VerifyTicketEx(const std::string& ticket, const Botan:
 
 extern std::shared_ptr<ConVar<bool>> g_oneSyncVar;
 fx::GameBuild g_enforcedGameBuild;
-bool g_replaceExecutable;
 
 static InitFunction initFunction([]()
 {
@@ -403,8 +403,13 @@ static InitFunction initFunction([]()
 		g_enforcedGameBuild = xbr::GetDefaultGTA5BuildString();
 		auto enforceGameBuildVar = instance->AddVariable<fx::GameBuild>("sv_enforceGameBuild", ConVar_ReadOnly | ConVar_ServerInfo, xbr::GetDefaultGTA5BuildString(), &g_enforcedGameBuild);
 
-		g_replaceExecutable = false;
-		auto replaceExecutableVar = instance->AddVariable<bool>("sv_replaceExeToSwitchBuilds", ConVar_ReadOnly | ConVar_ServerInfo, false, &g_replaceExecutable);
+		// The default game build communicated to clients. Clients use this as their default build
+		// instead of a hardcoded value, allowing server updates to roll out new defaults without client releases.
+		auto defaultGameBuildVar = instance->AddVariable<std::string>("sv_defaultGameBuild", ConVar_ServerInfo | ConVar_Internal, xbr::GetDefaultGTA5ExecutableString());
+
+		// Kept for backwards compatibility with older clients that read this value.
+		// Always false: we never replace the executable to switch builds.
+		auto replaceExecutableVar = instance->AddVariable<bool>("sv_replaceExeToSwitchBuilds", ConVar_ServerInfo | ConVar_Internal, false);
 
 		auto poolSizesIncrease = std::make_shared<std::unordered_map<std::string, uint32_t>>();
 		auto poolSizesIncreaseVar = instance->AddVariable<std::string>("sv_poolSizesIncrease", ConVar_ServerInfo | ConVar_Internal, "");
@@ -438,7 +443,7 @@ static InitFunction initFunction([]()
 			poolSizesIncreaseVar->GetHelper()->SetRawValue(nlohmann::json(*poolSizesIncrease).dump());
 		});
 
-		instance->GetComponent<fx::GameServer>()->OnTick.Connect([instance, enforceGameBuildVar]()
+		instance->GetComponent<fx::GameServer>()->OnTick.Connect([instance, enforceGameBuildVar, defaultGameBuildVar, replaceExecutableVar]()
 		{
 			if (instance->GetComponent<fx::GameServer>()->GetGameName() == fx::GameName::RDR3)
 			{
@@ -522,12 +527,6 @@ static InitFunction initFunction([]()
 
 			cb(json(nullptr));
 		});
-
-		auto experimentalStateBagsHandler = instance->AddVariable<bool>("sv_experimentalStateBagsHandler", ConVar_None, true);
-		auto experimentalOneSyncPopulation = instance->AddVariable<bool>("sv_experimentalOneSyncPopulation", ConVar_None, true);
-		// todo: remove fx::ServerGameState::GetGameEventHandler, fx::ServerGameState::GetHandler and fx::ServerGameState::GetRequestControlEventHandler when experimentalNetEvents is enabled by default and no longer a experiment
-		auto experimentalNetEvents = instance->AddVariable<bool>("sv_experimentalNetGameEventHandler", ConVar_None, true);
-		auto experimentalNetEventReassembly = instance->AddVariable<bool>("sv_experimentalNetEventReassemblyHandler", ConVar_None, false);
 
 		instance->GetComponent<fx::ClientMethodRegistry>()->AddHandler("initConnect", [=](const std::map<std::string, std::string>& postMap, const fwRefContainer<net::HttpRequest>& request, const std::function<void(const json&)>& cb)
 		{
@@ -702,26 +701,7 @@ static InitFunction initFunction([]()
 			json data = json::object();
 			data["protocol"] = 5;
 
-			if (experimentalNetEventReassembly->GetValue())
-			{
-				data["bitVersion"] = net::NetBitVersion::netVersion5;
-			}
-			else if (experimentalNetEvents->GetValue())
-			{
-				data["bitVersion"] = net::NetBitVersion::netVersion4;
-			}
-			else if (experimentalOneSyncPopulation->GetValue())
-			{
-				data["bitVersion"] = net::NetBitVersion::netVersion3;
-			}
-			else if (experimentalStateBagsHandler->GetValue())
-			{
-				data["bitVersion"] = net::NetBitVersion::netVersion2;
-			}
-			else
-			{
-				data["bitVersion"] = net::NetBitVersion::netVersion1;
-			}
+			data["bitVersion"] = net::NetBitVersion::netVersion5;
 
 			data["pure"] = pureVar->GetValue();
 			data["sH"] = shVar->GetValue();
@@ -729,10 +709,7 @@ static InitFunction initFunction([]()
 			data["onesync"] = fx::IsOneSync();
 			data["onesync_big"] = fx::IsBigMode();
 			data["onesync_lh"] = fx::IsLengthHack();
-			if (experimentalOneSyncPopulation->GetValue())
-			{
-				data["onesync_population"] = fx::IsOneSyncPopulation();
-			}
+			data["onesync_population"] = fx::IsOneSyncPopulation();
 
 			data["token"] = token;
 			data["gamename"] = gameName;
@@ -749,9 +726,6 @@ static InitFunction initFunction([]()
 			{
 				trace("Something went wrong. Pool sizes increase may not be set.");
 			}
-
-			// Capture replaceExecutableVar just to prolong it's lifetime until connection is initialized.
-			(void)replaceExecutableVar;
 
 			{
 				auto oldClient = clientRegistry->GetClientByGuid(guid);
@@ -783,6 +757,7 @@ static InitFunction initFunction([]()
 			}
 
 			bool gameNameMatch = false;
+			bool serverIdMatch = false;
 
 			if (ticketData.extraJson)
 			{
@@ -799,6 +774,17 @@ static InitFunction initFunction([]()
 							gameNameMatch = true;
 						}
 					}
+
+					if (json["si"].is_string())
+					{
+						auto sentServerId = json["si"].get<std::string>();
+
+						auto serverIdVar = instance->GetComponent<console::Context>()->GetVariableManager()->FindEntryRaw("sv_serverId");
+						if (serverIdVar && sentServerId == serverIdVar->GetValue())
+						{
+							serverIdMatch = true;
+						}
+					}
 				}
 				catch (std::exception& e)
 				{
@@ -811,11 +797,18 @@ static InitFunction initFunction([]()
 			if (lanVar->GetValue())
 			{
 				gameNameMatch = true;
+				serverIdMatch = true;
 			}
 
 			if (!gameNameMatch)
 			{
 				sendError("CitizenFX ticket authorization failed. (3)");
+				return;
+			}
+
+			if (!serverIdMatch)
+			{
+				sendError("CitizenFX ticket authorization failed. (4)");
 				return;
 			}
 
@@ -1048,7 +1041,7 @@ static InitFunction initFunction([]()
 				auto weakEarlyReject = std::weak_ptr(earlyReject);
 				auto weakNoReason = std::weak_ptr(noReason);
 
-				(*deferrals)->SetRejectCallback([deferrals, cbRef, clientWeak, weakEarlyReject, weakNoReason](const std::string& message)
+				(*deferrals)->SetRejectCallback([deferrals, cbRef, clientWeak, weakEarlyReject, weakNoReason](const std::string& message, const std::string& resourceName)
 				{
 					auto earlyReject = weakEarlyReject.lock();
 					auto noReason = weakNoReason.lock();
@@ -1062,6 +1055,23 @@ static InitFunction initFunction([]()
 					auto newLockedClient = clientWeak.lock();
 					if (newLockedClient)
 					{
+						std::string license;
+						for (const auto& identifier : newLockedClient->GetIdentifiers())
+						{
+							if (identifier.rfind("license:", 0) == 0)
+							{
+								license = identifier;
+								break;
+							}
+						}
+
+						StructuredTrace(
+							{ "type", "player_connection_rejected" },
+							{ "license", license },
+							{ "resource", resourceName },
+							{ "reason", message }
+						);
+
 						auto ref1 = *cbRef;
 
 						if (ref1)

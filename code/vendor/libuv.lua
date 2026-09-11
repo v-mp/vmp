@@ -12,7 +12,7 @@ return {
 	include = function()
 		includedirs { '../vendor/libnode/include/node/uv/include/' }
 
-        libdirs { '../vendor/libnode/bin/' }
+        libdirs { '../vendor/libuv/bin/' }
         if os.istarget('windows') then
             links { libName }
         else
@@ -25,11 +25,11 @@ return {
 
         files {
             -- dummy file to generate a project, so build commands are executed
-			'../vendor/libnode/tag.txt'
+			'../vendor/libuv/tag.txt'
 		}
 
         local baseURL = ('https://cdn.vmp.ir/mirrors/vendor/libnode/legacy%s/bin'):format(majorVersion)
-        local uvBinDir = path.getabsolute('../') .. '/vendor/libnode/bin'
+        local uvBinDir = path.getabsolute('../') .. '/vendor/libuv/bin'
 
 		if os.istarget('windows') then
 			filter 'files:**/tag.txt'
