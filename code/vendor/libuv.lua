@@ -28,6 +28,7 @@ return {
 			'../vendor/libnode/tag.txt'
 		}
 
+        local baseURL = ('https://cdn.vmp.ir/mirrors/vendor/libnode/legacy%s/bin'):format(majorVersion)
         local uvBinDir = path.getabsolute('../') .. '/vendor/libnode/bin'
 
 		if os.istarget('windows') then
@@ -39,6 +40,12 @@ return {
                 }
 
                 buildcommands {
+                    -- download files, redownload only if outdated
+                    ('echo "%s/%s"'):format(baseURL, dllName),
+                    ('curl.exe "-z%s/%s" -L "-o%s/%s" "%s/%s"'):format(uvBinDir, dllName, uvBinDir, dllName, baseURL, dllName),
+                    ('curl.exe "-z%s/%s" -L "-o%s/%s" "%s/%s"'):format(uvBinDir, pdbName, uvBinDir, pdbName, baseURL, pdbName),
+                    ('curl.exe "-z%s/%s" -L "-o%s/%s" "%s/%s"'):format(uvBinDir, libName, uvBinDir, libName, baseURL, libName),
+					'if %errorlevel% neq 0 (exit /b 1)',
 					('{COPY} %s/%s %%{cfg.targetdir}'):format(uvBinDir, dllName),
                     -- copy pdb manually to the server files
 					'{MKDIR} %{cfg.targetdir}/dbg/',
@@ -53,6 +60,7 @@ return {
                 }
 
                 buildcommands {
+                    ('curl "-z%s/%s" -L "-o%s/%s" "%s/%s"'):format(uvBinDir, soName, uvBinDir, soName, baseURL, soName),
 					('{COPY} %s/%s %%{cfg.targetdir}'):format(uvBinDir, soName),
                 }
 		end
