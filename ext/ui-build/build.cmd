@@ -2,16 +2,8 @@
 SETLOCAL EnableDelayedExpansion
 
 set GAME=%1
-SET UI_BUNDLE=cfx-ui-%GAME%.zip
-SET UI_BIG_BUNDLE=cfx-ui-%GAME%_big.zip
 
-if "%GAME%"=="five" (
-    set UI_URL=https://downloads.cfx-services.net/prod/019e6f02-87a9-76ec-86de-c637aee18c01
-    set UI_BIG_URL=https://downloads.cfx-services.net/prod/019e6f02-8c79-7d6d-acdf-5b874698c91c
-) else if "%GAME%"=="rdr3" (
-    set UI_URL=https://downloads.cfx-services.net/prod/019e6f02-8e48-7f30-9339-bc6b1fe0f6d3
-    set UI_BIG_URL=https://downloads.cfx-services.net/prod/019e6f02-90c5-7499-975a-88da5cfc8322
-) else (
+if not "%GAME%"=="five" if not "%GAME%"=="rdr3" (
     echo Invalid game specified: %GAME%
     exit /b 1
 )
@@ -19,6 +11,35 @@ if "%GAME%"=="five" (
 :: check if Yarn exists
 
 where /q yarn || exit /b !ERRORLEVEL!
+
+:: make sure no app leftovers
+if exist %~dp0\data\app (
+    rmdir /s /q %~dp0\data\app\
+)
+if exist %~dp0\data_big\app (
+    rmdir /s /q %~dp0\data_big\app\
+)
+
+:: build mpMenu from source
+::
+:: upstream downloads a prebuilt bundle from their CDN here. We cannot: ext/cfx-ui
+:: holds our own UI, put there by Invoke-UI (code/tools/ci/psm1/uiReplace.psm1),
+:: and a downloaded bundle would silently ship upstream's menu instead of ours.
+echo Building mpMenu...
+pushd ..\cfx-ui\
+
+call yarn --ignore-engines --frozen-lockfile || exit /b !ERRORLEVEL!
+call yarn test || exit /b !ERRORLEVEL!
+
+if exist build (
+    rmdir /s /q build
+)
+
+call yarn build 2>&1 || exit /b !ERRORLEVEL!
+
+echo Copying mpMenu files...
+move /y build\mpMenu %~dp0\data\app || exit /b !ERRORLEVEL!
+popd
 
 :: build loading screen
 echo Building loading screen...
@@ -30,15 +51,12 @@ echo Copying loadscreen files...
 xcopy /y /e dist\*.* %~dp0\data\loadscreen\ || exit /b !ERRORLEVEL!
 popd
 
-:: make sure no app leftovers
-if exist %~dp0\data\app (
-    rmdir /s /q %~dp0\data\app\
-)
-if exist %~dp0\data_big\app (
-    rmdir /s /q %~dp0\data_big\app\
-)
+:: split the heavy assets out into data_big so a small UI change does not make
+:: every client re-download the media
+echo Moving large files to data_big...
+mkdir %~dp0\data_big\app\static\media
+move /y %~dp0\data\app\static\media\*.* %~dp0\data_big\app\static\media\
 
-echo Moving loadscreen large files to data_big...
 mkdir %~dp0\data_big\loadscreen
 move /y %~dp0\data\loadscreen\*.jpg %~dp0\data_big\loadscreen\
 
@@ -52,16 +70,9 @@ if exist %~dp0\data_big.zip (
     del %~dp0\data_big.zip
 )
 
-:: download UI bundles
-echo Downloading UI bundle...
-curl.exe -k --fail-with-body -z%UI_BUNDLE% -L -o%UI_BUNDLE% %UI_URL% || exit /b !ERRORLEVEL!
-echo Downloading UI big bundle...
-curl.exe -k --fail-with-body -z%UI_BIG_BUNDLE% -L -o%UI_BIG_BUNDLE% %UI_BIG_URL% || exit /b !ERRORLEVEL!
-
-copy /y %~dp0\%UI_BUNDLE% %~dp0\data.zip || exit /b !ERRORLEVEL!
-copy /y %~dp0\%UI_BIG_BUNDLE% %~dp0\data_big.zip || exit /b !ERRORLEVEL!
-
-%~dp0\..\..\code\tools\ci\7z u -mx=0 %~dp0\data.zip %~dp0\data\* || exit /b !ERRORLEVEL!
-%~dp0\..\..\code\tools\ci\7z u -mx=0 %~dp0\data_big.zip %~dp0\data_big\* || exit /b !ERRORLEVEL!
+:: 'a' rather than 'u': the archives are built from our own output only, there is
+:: no downloaded bundle underneath to update
+%~dp0\..\..\code\tools\ci\7z a -mx=0 %~dp0\data.zip %~dp0\data\* || exit /b !ERRORLEVEL!
+%~dp0\..\..\code\tools\ci\7z a -mx=0 %~dp0\data_big.zip %~dp0\data_big\* || exit /b !ERRORLEVEL!
 
 exit /B 0
