@@ -899,6 +899,8 @@ concurrency::task<void> NetLibrary::ConnectToServer(const std::string& rootUrl)
 		Disconnect("Connecting to another server.");
 	}
 
+	Instance<ICoreGameInit>::Get()->SetData("serverId", "");
+
 	// late-initialize error state in ICoreGameInit
 	// this happens here so it only tries capturing if connection was attempted
 	static struct ErrorState 
@@ -1494,6 +1496,8 @@ concurrency::task<void> NetLibrary::ConnectToServer(const std::string& rootUrl)
 												{
 													auto targetContext = val.substr(val.find_first_of('_') + 1);
 													m_targetContext = targetContext.substr(0, targetContext.find_first_of(':'));
+
+													Instance<ICoreGameInit>::Get()->SetData("serverId", val.substr(0, val.find_first_of('x')));
 												}
 												catch (std::exception& e)
 												{
@@ -1863,6 +1867,8 @@ concurrency::task<void> NetLibrary::ConnectToServer(const std::string& rootUrl)
 					if (!poolSizesIncreaseRaw.empty())
 					{
 						poolSizesIncrease = nlohmann::json::parse(poolSizesIncreaseRaw);
+						fx::PoolSizeManager::Sanitize(poolSizesIncrease);
+						poolSizesIncreaseRaw = nlohmann::json(poolSizesIncrease).dump();
 					}
 
 					auto val = info["vars"].value("sv_enforceGameBuild", "");
@@ -1875,6 +1881,13 @@ concurrency::task<void> NetLibrary::ConnectToServer(const std::string& rootUrl)
 					{
 						buildRef = std::stoi(val);
 
+						// remap old build numbers
+						if (buildRef == 3717)
+						{
+							buildRef = xbr::Build::Winter_2025;
+							postMap["gameBuild"] = fmt::sprintf("%d", 3717);
+						}
+
 						if ((buildRef != 0 && buildRef != xbr::GetRequestedGameBuild()) ||
 							(pureLevel != fx::client::GetPureLevel()) ||
 							(poolSizesIncrease != fx::PoolSizeManager::GetIncreaseRequest()) ||
@@ -1886,18 +1899,6 @@ concurrency::task<void> NetLibrary::ConnectToServer(const std::string& rootUrl)
 								OnConnectionError(va("Server specified an invalid game build enforcement (%d).", buildRef), json::object({
 									{ "fault", "server" },
 									{ "action", "#ErrorAction_ContactOwner" },
-								})
-								.dump());
-								m_connectionState = CS_IDLE;
-								return;
-							}
-
-							std::optional<std::string> validationError = fx::PoolSizeManager::Validate(poolSizesIncrease);
-							if (validationError.has_value())
-							{
-								OnConnectionError(va("Server requested invalid change to pool sizes: %s.", validationError.value()), json::object({
-									{ "fault", "either" },
-									{ "action", "#ErrorAction_TryAgainContactOwner" },
 								})
 								.dump());
 								m_connectionState = CS_IDLE;

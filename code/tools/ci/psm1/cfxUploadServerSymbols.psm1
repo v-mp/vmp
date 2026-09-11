@@ -5,26 +5,19 @@ using module .\cfxSentry.psm1
 function Invoke-UploadServerSymbols {
     param(
         [CfxBuildContext] $Context,
-        [CfxBuildTools] $Tools
+        [CfxBuildTools] $Tools,
+        [string[]] $AdditionalSentryProjects = @()
     )
 
     $rsync = $Tools.getRsync()
     $symstore = $Tools.getSymstore()
     $dump_syms = $Tools.getDumpSyms()
 
-    $symPackDir = $Context.getPathInBuildCache("symbols\sym-pack")
     $symUploadDir = $Context.getPathInBuildCache("symbols\sym-upload")
     $symUploadDirLower = $Context.getPathInBuildCache("symbols\sym-upload2")
 
     Remove-Item -Force -Recurse $symUploadDir
     New-Item -ItemType Directory -Force $symUploadDir
-
-    Remove-Item -Force -Recurse $symPackDir
-    New-Item -ItemType Directory -Force $symPackDir
-
-    Remove-Item -Force -Recurse $symUploadDirLower
-    New-Item -ItemType Directory -Force $symUploadDirLower
-
 
     & $symstore add /o /f ($Context.MSBuildOutput) /s $symUploadDir /t "Cfx" /r
     Test-LastExitCode "Failed to upload symbols, symstore failed"
@@ -38,14 +31,6 @@ function Invoke-UploadServerSymbols {
         $outname = [io.path]::ChangeExtension($pdb.FullName, "sym")
 
         Start-Process $dump_syms -ArgumentList ($pdb.FullName) -RedirectStandardOutput $outname -Wait -WindowStyle Hidden
-    }
-
-    $syms = Get-ChildItem -Recurse -Filter "*.sym" -File ($Context.MSBuildOutput)
-
-    foreach ($sym in $syms) {
-        if ($sym.Length -gt 0) {
-            Copy-Item $sym.FullName $symPackDir\
-        }
     }
 
     # chdir to the directory to avoid converting path to what rsync would expect

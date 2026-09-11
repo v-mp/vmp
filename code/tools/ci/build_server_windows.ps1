@@ -61,8 +61,10 @@ try {
         Invoke-RunMSBuild -Context $ctx -Tools $tools
     }.GetNewClosure()
 
+    $additionalSentryProjects = @("fxserver-legacy-hangs")
+
     Invoke-LogSection "Uploading symbols" {
-        Invoke-UploadServerSymbols -Context $ctx -Tools $tools
+        Invoke-UploadServerSymbols -Context $ctx -Tools $tools -AdditionalSentryProjects $additionalSentryProjects
     }.GetNewClosure()
 
     Invoke-LogSection "Building system resources" {

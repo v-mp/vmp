@@ -138,6 +138,40 @@ static void UpdateSession(json& session)
 	g_session = session;
 }
 
+static std::string SlugifyString(const std::string& text)
+{
+	std::string result;
+	result.reserve(text.size());
+
+	bool lastWasDelimiter = false;
+	for (char ch : text)
+	{
+		if (ch >= 'A' && ch <= 'Z')
+		{
+			result += (ch + ('a' - 'A'));
+			lastWasDelimiter = false;
+		}
+		else if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9'))
+		{
+			result += ch;
+			lastWasDelimiter = false;
+		}
+		else
+		{
+			if (!lastWasDelimiter)
+			{
+				result += '-';
+				lastWasDelimiter = true;
+			}
+		}
+	}
+
+	size_t start = result.find_first_not_of('-');
+	if (start == std::string::npos) return "";
+	size_t end = result.find_last_not_of('-');
+	return result.substr(start, end - start + 1);
+}
+
 static void OnStartSession()
 {
 	auto oldSession = load_json_file(L"data\\cache\\session");
@@ -185,18 +219,22 @@ static void OnStartSession()
 
 	std::time_t t = std::time(nullptr);
 
-	static std::string curChannel = GetUpdateChannel();
+	static std::string curChannel = SlugifyString(GetUpdateChannel());
 
 	auto session = json::object({ 
 		{ "sid", sid },
 		{ "did", g_entitlementSource },
 		{ "init", true },
-		{ "started", fmt::format("{:%Y-%m-%dT%H:%M:%S}Z", *std::gmtime(&t)) },
 		{ "attrs", json::object({
 			{ "release", version },
 			{ "environment", curChannel }
 		}) }
 	});
+
+	tm time{};
+	if (gmtime_s(&time, &t) == 0) {
+		session["started"] = fmt::format("{:%Y-%m-%dT%H:%M:%S}Z", time);
+	}
 
 	UpdateSession(session);
 }
@@ -250,6 +288,7 @@ static std::map<std::string, std::string> load_crashometry()
 
 	return rv;
 }
+
 
 static std::wstring crashHash;
 
@@ -493,7 +532,6 @@ static std::wstring UnblameCrash(const std::wstring& hash)
 	return retval;
 }
 
-void SteamInput_Reset();
 void NVSP_ShutdownSafely();
 
 // c/p from ros-patches:five
@@ -1186,7 +1224,7 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 
 				parameters[L"GameBuild"] = ToWide(xbr::GetCurrentGameBuildString());
 
-				parameters[L"ReleaseChannel"] = ToWide(GetUpdateChannel());
+				parameters[L"ReleaseChannel"] = ToWide(SlugifyString(GetUpdateChannel()));
 
 				parameters[L"AdditionalData"] = GetAdditionalData();
 
@@ -1383,7 +1421,7 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 					{
 						windowTitle = L"Fatal Error";
 						mainInstruction = L"Early-exit trap";
-						content = fmt::sprintf(L"A problem while running %s has tripped an early-exit trap.\n\nIf asking for support, please provide a readable 'report ID' from the expanded information below.", PRODUCT_NAME);
+						content = fmt::sprintf(L"An error occurred while running %s, triggering an early-exit trap.\n\nIf asking for support, please provide a readable ‘report ID’ from the expanded information below:", PRODUCT_NAME);
 					}
 					else
 					{
@@ -1738,7 +1776,6 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 	// revert NVSP disablement
 #ifdef LAUNCHER_PERSONALITY_MAIN
 	NVSP_ShutdownSafely();
-	SteamInput_Reset();
 
 	g_session["status"] = "exited";
 	UpdateSession(g_session);
@@ -1746,12 +1783,6 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 	_wunlink(MakeRelativeCitPath(L"data\\cache\\error-pickup").c_str());
 	_wunlink(MakeRelativeCitPath(L"data\\cache\\session").c_str());
 #endif
-
-	// delete steam_appid.txt on last process exit to curb paranoia about MTL mod checks
-	// we don't use MakeRelativeGamePath as this'll make a `static` CfxInitState
-	{
-		_wunlink(fmt::format(L"{}\\steam_appid.txt", GetMinidumpGamePath()).c_str());
-	}
 
 	_wunlink(MakeRelativeCitPath(L"data\\cache\\extra_dump_info.bin").c_str());
 	_wunlink(MakeRelativeCitPath(L"data\\cache\\extra_dump_info2.bin").c_str());

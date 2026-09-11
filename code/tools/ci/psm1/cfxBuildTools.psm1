@@ -150,6 +150,17 @@ class CfxBuildTools {
     [boolean] hidden $_bcmVerified = $false
     [string] getBCM() {
         if (!$this._bcmVerified) {
+            # Try one from toolkit first
+            if ($env:CFX_BUILD_TOOLKIT_TOOL_BCM) {
+                if (Test-Path $env:CFX_BUILD_TOOLKIT_TOOL_BCM) {
+                    $this._bcm = $env:CFX_BUILD_TOOLKIT_TOOL_BCM
+                    $this._bcmVerified = $true
+                    return $this._bcm
+                } else {
+                    $this.ctx.addBuildWarning("BCM from gh releases will be used instead of one from the toolkit: CFX_BUILD_TOOLKIT_TOOL_BCM is set but the path does not exist: $env:CFX_BUILD_TOOLKIT_TOOL_BCM")
+                }
+            }
+
             $bcmDir = $this.ctx.getPathInBuildCache("build-cache-meta")
             $bcmPath = "$bcmDir\buildcachemeta-go.exe"
             $bcmURL = "https://cdn.vmp.ir/build/buildcachemeta-go-v0.0.19-windows-win32.tar.gz"
@@ -192,7 +203,7 @@ class CfxBuildTools {
                 Test-LastExitCode "Failed to fetch sentry-cli"
             }
 
-            $this._sentryCLI = $sentryCLIPath
+            $this._sentryCLI = $cmd.Source
             $this._sentryCLIVerified = $true
         }
 

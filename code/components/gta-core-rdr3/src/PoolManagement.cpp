@@ -640,10 +640,13 @@ static std::unordered_map<uint32_t, std::string_view> pedPoolEntries{
 	{ HashString("CPedVisibilityComponent"), "CPedVisibilityComponent" },
 	{ HashString("CNetBlenderPed"), "CNetBlenderPed" },
 	{ HashString("CPedSyncData"), "CPedSyncData" },
-
+	{ HashString("CEmotionalLocoHelper"), "CEmotionalLocoHelper" },
+	{ HashString("CCrimeObserver"), "CCrimeObserver" },
+	{ HashString("CAnimalGroupMember"), "CAnimalGroupMember" },
 	{ HashString("CPedFootstepComponent"), "CPedSyncData" },
 	{ HashString("CCharacterItem"), "CCharacterItem" },
-	{ HashString("CPedBreatheComponent"), "CPedBreatheComponent" }
+	{ HashString("CPedBreatheComponent"), "CPedBreatheComponent" },
+	{ HashString("CPedTargetingComponent"), "CPedTargetingComponent" }
 };
 
 static std::unordered_map<uint32_t, std::string_view> objectPoolEntries{
@@ -777,6 +780,13 @@ static int64_t GetSizeOfPool(void* configManager, uint32_t poolHash, int default
 {
 	int64_t size = g_origGetSizeOfPool(configManager, poolHash, defaultSize);
 
+	// At the top to allow increase pool sizes that are being automatically increased this way we can increase specifc pool sizes if needed, some of them need a little bump like CPedSyncData.
+	auto sizeIncreaseEntry = fx::PoolSizeManager::GetIncreaseRequest().find(poolEntries.LookupHash(poolHash));
+	if (sizeIncreaseEntry != fx::PoolSizeManager::GetIncreaseRequest().end())
+	{
+		size += sizeIncreaseEntry->second;
+	}
+
 	// There are several pools that are tied to Peds/CNetObjPedBase. We want to ensure that the increased value is applied to all of these components.
 	if (auto it = pedPoolEntries.find(poolHash); it != pedPoolEntries.end())
 	{
@@ -807,12 +817,6 @@ static int64_t GetSizeOfPool(void* configManager, uint32_t poolHash, int default
 			size += sizeIncreaseEntry->second;
 		}
 		return size;
-	}
-
-	auto sizeIncreaseEntry = fx::PoolSizeManager::GetIncreaseRequest().find(poolEntries.LookupHash(poolHash));
-	if (sizeIncreaseEntry != fx::PoolSizeManager::GetIncreaseRequest().end())
-	{
-		size += sizeIncreaseEntry->second;
 	}
 
 	return size;

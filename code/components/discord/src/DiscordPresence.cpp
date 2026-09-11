@@ -17,7 +17,7 @@
 #define DEFAULT_APP_ID "1228105632113229865"
 #define DEFAULT_APP_ASSET "vmp_large"
 #elif defined(IS_RDR3)
-#define DEFAULT_APP_ID "879627773839278110"
+#define DEFAULT_APP_ID "1473627077826576454"
 #define DEFAULT_APP_ASSET "redm_large"
 #endif
 

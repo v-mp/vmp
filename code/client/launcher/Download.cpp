@@ -424,8 +424,6 @@ static int DL_CurlDebug(CURL *handle,
 	return 0;
 }
 
-extern void UI_SetSnailState(bool snail);
-
 #include <shellapi.h>
 #include <shobjidl.h>
 #include <wrl.h>
