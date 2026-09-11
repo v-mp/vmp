@@ -8,8 +8,10 @@
 #include "StdInc.h"
 #include <ServerIdentityProvider.h>
 
-#define STEAM_APPID_FIVEM 2676230
-#define STEAM_APPID_REDM 4333400
+// the fork still ships the pre-rework Steam client, which asks Steam for its
+// auth ticket as app id 218; validating that ticket against upstream's new
+// per-game ids rejects every login. Keep in sync with SteamComponent.
+#define STEAM_APPID 218
 
 // this imports pplxtasks somewhere?
 #define _PPLTASK_ASYNC_LOGGING 0
@@ -153,16 +155,7 @@ static InitFunction initFunction([]()
 		g_steamApiUrl = instance->AddVariable<std::string>("steam_webApiUrl", ConVar_None, "https://api.steampowered.com/ISteamUserAuth/AuthenticateUserTicket/v1/");
 		g_enforceSteamAuth = instance->AddVariable<bool>("sv_enforceSteamAuth", ConVar_ServerInfo, false);
 
-		const auto gameName = instance->GetComponent<fx::GameServer>()->GetGameName();
-
-		if (gameName == fx::GameName::GTA5)
-		{
-			steamAppId = STEAM_APPID_FIVEM;
-		}
-		else if (gameName == fx::GameName::RDR3)
-		{
-			steamAppId = STEAM_APPID_REDM;
-		}
+		steamAppId = STEAM_APPID;
 
 		serverInstance = instance;
 	});
