@@ -203,7 +203,7 @@ class CfxBuildTools {
                 Test-LastExitCode "Failed to fetch sentry-cli"
             }
 
-            $this._sentryCLI = $cmd.Source
+            $this._sentryCLI = $sentryCLIPath
             $this._sentryCLIVerified = $true
         }
 
