@@ -1,7 +1,7 @@
 /*
- * This file is part of the CitizenFX project - http://citizen.re/
+ * This file is part of the Cfx project - https://cfx.re/
  *
- * See LICENSE and MENTIONS in the root of the source tree for information
+ * See LICENSE in the root of the source tree for information
  * regarding licensing.
  */
 
@@ -31,7 +31,12 @@
 
 static hook::cdecl_stub<void()> lookAlive([] ()
 {
-	return hook::pattern("48 8D 6C 24 ? 48 81 EC ? 01 00 00 E8").count(1).get(0).get<void>(-0xC);
+	if (xbr::IsGameBuildOrGreater<xbr::Build::Summer_2026>())
+	{
+		return hook::get_pattern("48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8B EC 48 83 EC ? E8");
+	}
+	
+	return hook::get_pattern("48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? E8");
 });
 
 // map init states to cater for additional '7' in one particular digital distribution version

@@ -1,7 +1,7 @@
 /*
- * This file is part of the CitizenFX project - http://citizen.re/
+ * This file is part of the Cfx project - https://cfx.re/
  *
- * See LICENSE and MENTIONS in the root of the source tree for information
+ * See LICENSE in the root of the source tree for information
  * regarding licensing.
  */
 
@@ -443,6 +443,11 @@ static InitFunction initFunction([] ()
 				}
 
 				brandName += fmt::sprintf(L" (b%d)", xbr::GetRequestedGameBuild());
+
+				if (xbr::GetGameBuild() != xbr::GetRequestedGameBuild() && xbr::GetGameBuild() != xbr::GetDefaultGameBuild())
+				{
+					brandName += fmt::sprintf(L" [e%d]", xbr::GetGameBuild());
+				}
 
 				if (launch::IsSDKGuest())
 				{

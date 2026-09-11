@@ -1,7 +1,7 @@
 /*
- * This file is part of the CitizenFX project - http://citizen.re/
+ * This file is part of the Cfx project - https://cfx.re/
  *
- * See LICENSE and MENTIONS in the root of the source tree for information
+ * See LICENSE in the root of the source tree for information
  * regarding licensing.
  */
 
@@ -9,6 +9,12 @@
 #include "Hooking.h"
 
 #include <optick.h>
+
+struct sysIpcThreadStartInfo
+{
+	void* startRoutine;
+	// more members
+};
 
 static HANDLE CreateThreadWrapper(_In_opt_ LPSECURITY_ATTRIBUTES lpThreadAttributes, _In_ SIZE_T dwStackSize, _In_ LPTHREAD_START_ROUTINE lpStartAddress,
 								  _In_opt_ __drv_aliasesMem LPVOID lpParameter, _In_ DWORD dwCreationFlags, _Out_opt_ LPDWORD lpThreadId)
@@ -22,10 +28,10 @@ static HANDLE CreateThreadWrapper(_In_opt_ LPSECURITY_ATTRIBUTES lpThreadAttribu
 	{
 		char* threadName;
 		LPTHREAD_START_ROUTINE origRoutine;
-		void* originalData;
+		sysIpcThreadStartInfo* originalData;
 	};
 
-	WrapThreadMeta* parameter = new WrapThreadMeta{ threadName, lpStartAddress, lpParameter };
+	WrapThreadMeta* parameter = new WrapThreadMeta{ threadName, lpStartAddress, reinterpret_cast<sysIpcThreadStartInfo*>(lpParameter) };
 
 	// create a thread with 'our' callback
 	HANDLE hThread = CreateThread(lpThreadAttributes, dwStackSize, [] (void* arguments)
@@ -41,6 +47,10 @@ static HANDLE CreateThreadWrapper(_In_opt_ LPSECURITY_ATTRIBUTES lpThreadAttribu
 			SetThreadName(-1, meta.threadName);
 
 			OPTICK_START_THREAD(meta.threadName);
+		}
+		else
+		{
+			SetThreadName(-1, va("sysThread (0x%x)", hook::get_unadjusted(meta.originalData->startRoutine)));
 		}
 
 		// invoke original thread start

@@ -67,4 +67,9 @@ int GetEnforcedGameBuildNumber()
 
 	return build;
 }
+
+bool GetReplaceExecutable()
+{
+	return false;
+}
 }

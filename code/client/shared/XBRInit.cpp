@@ -63,31 +63,44 @@ int GetRequestedGameBuildInit()
 	return buildNumber;
 }
 
-int GetEffectiveDefaultGameBuildInit()
+bool GetReplaceExecutableInit()
 {
 	std::wstring fpath = MakeRelativeCitPath(L"VMP.ini");
-	int effectiveDefault = GetDefaultGameBuild();
-
 	if (GetFileAttributes(fpath.c_str()) != INVALID_FILE_ATTRIBUTES)
 	{
-		int persisted = GetPrivateProfileInt(L"Game", L"DefaultGameBuild", 0, fpath.c_str());
-		if (persisted >= GetDefaultGameBuild())
+		int defaultBuild = GetPrivateProfileInt(L"Game", L"DefaultBuild", 0, fpath.c_str());
+		if (defaultBuild > 0)
 		{
-			effectiveDefault = persisted;
+			return false;
+		}
+
+		return (GetPrivateProfileInt(L"Game", L"ReplaceExecutable", 0, fpath.c_str()) != 0);
+	}
+
+	return false;
+}
+
+int GetDefaultBuildInit()
+{
+	std::wstring fpath = MakeRelativeCitPath(L"VMP.ini");
+	if (GetFileAttributes(fpath.c_str()) != INVALID_FILE_ATTRIBUTES)
+	{
+		// New ini key: explicit default build persisted from sv_defaultGameBuild or legacy effectiveDefaultBuild
+		int defaultBuild = GetPrivateProfileInt(L"Game", L"DefaultBuild", 0, fpath.c_str());
+		if (defaultBuild > 0)
+		{
+			return defaultBuild;
+		}
+
+		// Backward compat: old ReplaceExecutable=1 means use the requested build's exe directly
+		bool replaceExecutable = (GetPrivateProfileInt(L"Game", L"ReplaceExecutable", 0, fpath.c_str()) != 0);
+		if (replaceExecutable)
+		{
+			return GetRequestedGameBuildInit();
 		}
 	}
 
-	return effectiveDefault;
-}
-
-void SetEffectiveDefaultGameBuild(int build)
-{
-	std::wstring fpath = MakeRelativeCitPath(L"CitizenFX.ini");
-
-	if (GetFileAttributes(fpath.c_str()) != INVALID_FILE_ATTRIBUTES)
-	{
-		WritePrivateProfileString(L"Game", L"DefaultGameBuild", fmt::sprintf(L"%d", build).c_str(), fpath.c_str());
-	}
+	return GetDefaultGameBuild();
 }
 
 }

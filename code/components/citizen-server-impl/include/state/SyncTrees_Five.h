@@ -4777,7 +4777,7 @@ using CPlayerSyncTree = SyncTree<
 			NodeWrapper<NodeIds<127, 127, 0>, CPedHealthDataNode, 17>,
 			NodeWrapper<NodeIds<87, 87, 0>, CPedMovementGroupDataNode, 26>,
 			NodeWrapper<NodeIds<127, 127, 1>, CPedAIDataNode, 9>,
-			NodeWrapper<NodeIds<87, 87, 0>, CPlayerAppearanceDataNode, 560>,
+			NodeWrapper<NodeIds<87, 87, 0>, CPlayerAppearanceDataNode, 561>,
 			NodeWrapper<NodeIds<86, 86, 0>, CPlayerPedGroupDataNode, 19>,
 			NodeWrapper<NodeIds<86, 86, 0>, CPlayerAmbientModelStreamingNode, 5>,
 			NodeWrapper<NodeIds<86, 86, 0>, CPlayerGamerDataNode, 370>,

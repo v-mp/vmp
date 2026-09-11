@@ -111,7 +111,6 @@ export class GameServerLegacyMode implements GameServerMode {
     if (licenseKey) {
       fxserverArgs.push('+set', 'sv_licenseKey', licenseKey);
       fxserverArgs.push('+set', 'sv_master1', '');
-      fxserverArgs.push('+set', 'sv_endpointPrivacy', '1');
 
       await this.gameServerManagerService.ensureSvAdhesiveEnabled(updateChannel, true);
     } else {

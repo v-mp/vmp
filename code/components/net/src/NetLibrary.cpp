@@ -1,7 +1,7 @@
 /*
- * This file is part of the CitizenFX project - http://citizen.re/
+ * This file is part of the Cfx project - https://cfx.re/
  *
- * See LICENSE and MENTIONS in the root of the source tree for information
+ * See LICENSE in the root of the source tree for information
  * regarding licensing.
  */
 
@@ -1874,18 +1874,29 @@ concurrency::task<void> NetLibrary::ConnectToServer(const std::string& rootUrl)
 					auto val = info["vars"].value("sv_enforceGameBuild", "");
 					int buildRef = 0;
 
-					// Read the server's default game build (exe version). Fall back to the client's hardcoded minimum if not provided.
-					auto serverDefaultBuildStr = info["vars"].value("sv_defaultGameBuild", "");
+					// Determine the server-mandated default game build (exe build).
+					// The client's hardcoded default acts as a floor to prevent abuse.
 					int serverDefaultBuild = xbr::GetDefaultGameBuild();
-					if (!serverDefaultBuildStr.empty())
+					bool hasServerDefaultBuild = false;
 					{
-						int parsed = std::stoi(serverDefaultBuildStr);
-						// Only accept the server's default if it's at or above the client's minimum.
-						if (parsed >= xbr::GetDefaultGameBuild())
+						auto serverDefaultBuildVal = info["vars"].value("sv_defaultGameBuild", "");
+						if (!serverDefaultBuildVal.empty())
 						{
-							serverDefaultBuild = parsed;
+							int parsed = std::stoi(serverDefaultBuildVal);
+							if (parsed >= xbr::GetDefaultGameBuild())
+							{
+								serverDefaultBuild = parsed;
+								hasServerDefaultBuild = true;
+							}
 						}
 					}
+
+					// Backward compat: old servers use sv_replaceExeToSwitchBuilds to indicate
+					// whether the client should use the enforced build's exe directly.
+					// Special build 1 with all DLCs turned off can not be achieved by replacing the executable.
+					bool legacyReplaceExecutable = !hasServerDefaultBuild &&
+						info["vars"].value("sv_replaceExeToSwitchBuilds", "true") != std::string("false") &&
+						val != std::string("1");
 
 					if (!val.empty())
 					{
@@ -1897,32 +1908,40 @@ concurrency::task<void> NetLibrary::ConnectToServer(const std::string& rootUrl)
 							buildRef = xbr::Build::Winter_2025;
 							postMap["gameBuild"] = fmt::sprintf("%d", 3717);
 						}
-					}
 
-					// If no explicit enforcement, the DLC level matches the server's default exe build.
-					if (buildRef == 0)
-					{
-						buildRef = serverDefaultBuild;
-					}
+						// Compute the effective exe build for this connection.
+						// Old server with replaceExecutable=true: exe matches the enforced build.
+						// Old server with replaceExecutable=false: exe matches the server default (floor).
+						// New server with sv_defaultGameBuild: exe matches that value.
+						int effectiveDefaultBuild = legacyReplaceExecutable ? buildRef : serverDefaultBuild;
 
-					if ((buildRef != xbr::GetRequestedGameBuild()) ||
-						(serverDefaultBuild != xbr::GetEffectiveDefaultGameBuild()) ||
-						(pureLevel != fx::client::GetPureLevel()) ||
-						(poolSizesIncrease != fx::PoolSizeManager::GetIncreaseRequest())
-					)
-					{
-						if (!xbr::IsSupportedGameBuild(buildRef))
+						if ((buildRef != 0 && buildRef != xbr::GetRequestedGameBuild()) ||
+							(pureLevel != fx::client::GetPureLevel()) ||
+							(poolSizesIncrease != fx::PoolSizeManager::GetIncreaseRequest()) ||
+							(effectiveDefaultBuild != xbr::GetPersistedDefaultBuild())
+						)
 						{
-							OnConnectionError(va("Server specified an invalid game build enforcement (%d).", buildRef), json::object({
-								{ "fault", "server" },
-								{ "action", "#ErrorAction_ContactOwner" },
-							})
-							.dump());
+							if (!xbr::IsSupportedGameBuild(buildRef))
+							{
+								OnConnectionError(va("Server specified an invalid game build enforcement (%d).", buildRef), json::object({
+									{ "fault", "server" },
+									{ "action", "#ErrorAction_ContactOwner" },
+								})
+								.dump());
+								m_connectionState = CS_IDLE;
+								return;
+							}
+
+							OnRequestBuildSwitch(buildRef, pureLevel, ToWide(poolSizesIncreaseRaw), effectiveDefaultBuild);
 							m_connectionState = CS_IDLE;
 							return;
 						}
+					}
 
-						if (buildRef < serverDefaultBuild && !xbr::IsSupportedGameBuild(serverDefaultBuild))
+#if defined(GTA_FIVE)
+					if (buildRef == 0 && xbr::GetRequestedGameBuild() != serverDefaultBuild)
+					{
+						if (!xbr::IsSupportedGameBuild(serverDefaultBuild))
 						{
 							OnConnectionError(va("Server specified an invalid default game build (%d).", serverDefaultBuild), json::object({
 								{ "fault", "server" },
@@ -1933,10 +1952,11 @@ concurrency::task<void> NetLibrary::ConnectToServer(const std::string& rootUrl)
 							return;
 						}
 
-						OnRequestBuildSwitch(buildRef, pureLevel, ToWide(poolSizesIncreaseRaw), serverDefaultBuild);
+						OnRequestBuildSwitch(serverDefaultBuild, 0, L"", serverDefaultBuild);
 						m_connectionState = CS_IDLE;
 						return;
 					}
+#endif
 
 					auto ival = info["vars"].value("sv_sessionId", "");
 

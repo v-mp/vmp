@@ -2,55 +2,64 @@
 
 #include <rlNetBuffer.h>
 #include <NetworkPlayerMgr.h>
+#include <XBRVirtual.h>
 
 #include <boost/preprocessor/repeat.hpp>
 
 namespace rage
 {
+#ifdef GTA_FIVE
+class netArrayHandlerBase : XBR_VIRTUAL_BASE(2060, 43 * 8, 1)
+#else
 class netArrayHandlerBase
+#endif
 {
 public:
+#define DEFINE_VF(z, n, text) \
+	XBR_VIRTUAL_METHOD(void, m_##n, ())
+
+#ifdef IS_RDR3
 	virtual ~netArrayHandlerBase() = default;
 
-#define DEFINE_VF(z, n, text) \
-	virtual void m_##n() = 0;
-
 	BOOST_PP_REPEAT(42, DEFINE_VF, );
+#else
+	BOOST_PP_REPEAT(43, DEFINE_VF, );
+#endif
 
 #undef DEFINE_VF
 
-	virtual bool IsElementEmpty(uint32_t element) = 0;
+	XBR_VIRTUAL_METHOD(bool, IsElementEmpty, (uint32_t element))
 
-	virtual void SetElementEmpty(uint32_t element) = 0;
+	XBR_VIRTUAL_METHOD(void, SetElementEmpty, (uint32_t element))
 
-	virtual void WriteElementIndex(const rage::netPlayer& player, rage::datBitBuffer& buffer, uint32_t) = 0;
+	XBR_VIRTUAL_METHOD(void, WriteElementIndex, (rage::datBitBuffer& buffer, uint32_t element))
 
-	virtual void ReadElementIndex(const rage::netPlayer& player, rage::datBitBuffer& buffer, uint32_t&) = 0;
+	XBR_VIRTUAL_METHOD(void, ReadElementIndex, (rage::datBitBuffer& buffer, uint32_t& element))
 
-	virtual bool IsValidIndex(uint32_t) = 0;
+	XBR_VIRTUAL_METHOD(bool, IsValidIndex, (uint32_t element))
 
-	virtual void RecalculateDirtyElements() = 0;
+	XBR_VIRTUAL_METHOD(void, RecalculateDirtyElements, ())
 
-	virtual void ResetElementSyncData(uint32_t element) = 0;
+	XBR_VIRTUAL_METHOD(void, ResetElementSyncData, (uint32_t element))
 
-	virtual void DoPostReadProcessing() = 0;
+	XBR_VIRTUAL_METHOD(void, DoPostReadProcessing, ())
 
-	virtual void DoPostElementReadProcessing(uint32_t element) = 0;
+	XBR_VIRTUAL_METHOD(void, DoPostElementReadProcessing, (uint32_t element))
 
 	// we'll probably need to pass `force` as we don't have any *real* sender data
-	virtual bool CanApplyElementData(uint32_t element, const rage::netPlayer& sender, bool force) = 0;
+	XBR_VIRTUAL_METHOD(bool, CanApplyElementData, (uint32_t element, const rage::netPlayer& sender, bool force))
 
-	virtual void ExtractDataForSerialising(uint32_t elem) = 0;
+	XBR_VIRTUAL_METHOD(void, ExtractDataForSerialising, (uint32_t elem))
 
-	virtual void WriteElement(rage::datBitBuffer& buffer, uint32_t elem, void* logger) = 0;
+	XBR_VIRTUAL_METHOD(void, WriteElement, (rage::datBitBuffer& buffer, uint32_t elem, void* logger))
 
-	virtual void ReadElement(rage::datBitBuffer& buffer, uint32_t elem, void* logger) = 0;
+	XBR_VIRTUAL_METHOD(void, ReadElement, (rage::datBitBuffer& buffer, uint32_t elem, void* logger))
 
-	virtual void LogElement(uint32_t elem, void* logger) = 0;
+	XBR_VIRTUAL_METHOD(void, LogElement, (uint32_t elem, void* logger))
 
-	virtual uint32_t GetCurrentElementSizeInBits(uint32_t elem) = 0;
+	XBR_VIRTUAL_METHOD(uint32_t, GetCurrentElementSizeInBits, (uint32_t elem))
 
-	virtual void ApplyElementData(uint32_t element, const rage::netPlayer& sender) = 0;
+	XBR_VIRTUAL_METHOD(void, ApplyElementData, (uint32_t element, const rage::netPlayer& sender))
 
 	inline uint32_t GetSize()
 	{
@@ -62,7 +71,7 @@ public:
 	uint8_t m_pad[244 - 8]; // +8
 	uint16_t m_index; // 244
 	uint16_t m_count; // 246
-	uint8_t m_unk; // 248
+	uint8_t m_numElementsInUse; // 248
 	uint8_t m_elementSize; // 249
 	uint8_t m_pad2[14]; // 250
 	void* m_array; // 264
@@ -71,7 +80,8 @@ public:
 	uint16_t m_index; // 308
 	uint8_t m_pad2[130]; // 310
 	uint16_t m_count; // 440
-	uint8_t m_pad3[6]; // 442
+	uint16_t m_numElementsInUse; // 442
+	uint8_t m_pad3[4]; // 444
 	uint8_t m_elementSize; // 448
 	uint8_t m_pad4[23]; // 449
 	void* m_array; // 472

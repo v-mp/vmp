@@ -1509,6 +1509,9 @@ static HookFunction hookFunction([]()
 		g_offset_playerAppearanceDataNode_hasDecorations = *hook::get_pattern<uint32_t>("88 ? ? ? ? ? 84 C0 75 0D 44 8B C5 33", 2);
 	}
 
+	// Change bit size of component variation data from 7 to 8 in CPlayerAppearanceDataNode
+	hook::put(hook::get_pattern("41 B8 ? ? ? ? 48 8B 03 45 33 C9", 2), 8);
+
 	// allow CSyncDataLogger even without label string
 	hook::nop(hook::get_pattern("4D 85 C9 74 44 48 8D 4C", 3), 2);
 	hook::nop(hook::get_pattern("4D 85 C0 74 25 80 3A 00", 3), 2);

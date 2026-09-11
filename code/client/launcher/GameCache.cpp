@@ -1,7 +1,7 @@
 /*
-* This file is part of the CitizenFX project - http://citizen.re/
+* This file is part of the Cfx project - https://cfx.re/
 *
-* See LICENSE and MENTIONS in the root of the source tree for information
+* See LICENSE in the root of the source tree for information
 * regarding licensing.
 */
 
@@ -1357,16 +1357,16 @@ static bool PerformUpdate(const std::vector<GameCacheEntry>& entries)
 
 #if defined(COMPILING_GLUE)
 extern int gameCacheTargetBuild;
-extern int gameCacheEffectiveDefault;
+extern int gameCacheDefaultBuild;
 
 inline int GetTargetGameBuild()
 {
 	return gameCacheTargetBuild;
 }
 
-inline int GetEffectiveDefault()
+inline int GetDefaultBuild()
 {
-	return gameCacheEffectiveDefault;
+	return gameCacheDefaultBuild;
 }
 #else
 inline int GetTargetGameBuild()
@@ -1374,9 +1374,9 @@ inline int GetTargetGameBuild()
 	return xbr::GetRequestedGameBuild();
 }
 
-inline int GetEffectiveDefault()
+inline int GetDefaultBuild()
 {
-	return xbr::GetEffectiveDefaultGameBuild();
+	return xbr::GetGameBuild();
 }
 #endif
 
@@ -1395,6 +1395,60 @@ bool IsTargetGameBuildOrGreater()
 static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBuild = {
 #ifdef GTA_FIVE
 	{
+		3889,
+		{
+			{
+				"GTA5.exe",
+				{ "GTA5.exe", "a9bff6962adade85843616fd932df58b13e68036", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/GTA5.exe", 47467128 },
+			},
+			{
+				"update.rpf",
+				{
+					"update/update.rpf", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/update.rpf", 2014193664,
+					{
+						{ "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_1604_to_3889.update.rpf.hdiff", 1520607219 } /* diff sha1: 48d5d78b1975eb4f59f750204e768de7f1f94a43 */,
+						{ "736f1cb26e59167f302c22385463d231cce302d3", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_2060_to_3889.update.rpf.hdiff", 1292820764 } /* diff sha1: 88c41cc4c9f273922c136e31c37983d42a93a3cc */,
+						{ "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_2189_to_3889.update.rpf.hdiff", 1250648559 } /* diff sha1: 187f1d933837b9f276594eacb15294ad4a63779a */,
+						{ "1824cdbc27c3e0eaa86920a38751322727872831", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_2372_to_3889.update.rpf.hdiff", 1235034885 } /* diff sha1: bbb2304749570c8db6cdc443105ee9116f0acda4 */,
+						{ "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_2545_to_3889.update.rpf.hdiff", 1096923323 } /* diff sha1: afe98e5a2a0e1b9e1b91d8c9cab3d3145710f920 */,
+						{ "80f9bd028e5bc781f641fe210a88579eff827989", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_2612_to_3889.update.rpf.hdiff", 1096922209 } /* diff sha1: 12e3bb4f308903855910d49d2be2c2bb4af1edb2 */,
+						{ "86d88c5ea36e67683a138c0e690c42fe288205fa", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_2699_to_3889.update.rpf.hdiff", 1052142402 } /* diff sha1: 38a14676ac37f3f651a01db6b202d2d8b34afc69 */,
+						{ "66388a381347511b7b28aaf91741615e45008e8b", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_2802_to_3889.update.rpf.hdiff", 995682048 } /* diff sha1: 51b56cea521b57634b02e9b2b9a3deea4318e809 */,
+						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_2944_to_3889.update.rpf.hdiff", 985614345 } /* diff sha1: da347faa6a42c17b29c4d238858f93b02775c06c */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3095_to_3889.update.rpf.hdiff", 657759280 } /* diff sha1: f95d40000b28830f7bf8c34e868dc9acaf5a8382 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3095_to_3889.update.rpf.hdiff", 657759280 } /* diff sha1: f95d40000b28830f7bf8c34e868dc9acaf5a8382 */,
+						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3258_to_3889.update.rpf.hdiff", 649812315 } /* diff sha1: 05f86f4472fb1bf1808d3d1369f6147434cd2b71 */,
+						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3323_to_3889.update.rpf.hdiff", 649791573 } /* diff sha1: cfc6847aa27715196079b992dc4c80d482d9925d */,
+						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3407_to_3889.update.rpf.hdiff", 637739905 } /* diff sha1: e0d8e768473760e9f4539110b42a36bb2417022b */,
+						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3570_to_3889.update.rpf.hdiff", 611541852 } /* diff sha1: 6f9015557b677edf921f7de08e942da9ee022be1 */,
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3751_to_3889.update.rpf.hdiff", 15994670 } /* diff sha1: 1ecc2002187fba12628db6db4f07ab5164e26c98 */,
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "31cbd81373475d5407c20058733ea910cadce13b", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3751_to_3889.update.rpf.hdiff", 15994670 } /* diff sha1: 1ecc2002187fba12628db6db4f07ab5164e26c98 */
+					},
+				},
+			},
+			{
+				"update2.rpf",
+				{
+					"update/update2.rpf", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/update2.rpf", 503742464,
+					{
+						{ "c993e2d14cce9462fa8ba056f3406d60050a1c92", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_2612_to_3889.update2.rpf.hdiff", 433099044 } /* diff sha1: 454695b720fabcea24f720e8a8c0be8a3f951bd0 */,
+						{ "414a04256bf0b00b78324478508a6beaea1ef5a7", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_2699_to_3889.update2.rpf.hdiff", 431413110 } /* diff sha1: 4700e97c087d250b030c3107cb386d1e8274062d */,
+						{ "c7de68bdc56ec4577bd4fce5d85cca9a4d529839", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_2802_to_3889.update2.rpf.hdiff", 431110090 } /* diff sha1: a73c0ceb90b50d47c9084c34cf6975e8ee38fbb5 */,
+						{ "a3181d68a532950da5c584100b35f79eaca7c884", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_2944_to_3889.update2.rpf.hdiff", 430845481 } /* diff sha1: c22dc154611b7346b36509da517c4b18f4c4e0cc */,
+						{ "1c785e7b5cfe8331aad335b3f78952bc66b9fcb6", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3095_to_3889.update2.rpf.hdiff", 429647926 } /* diff sha1: f39b67f4e30211ba177779b8eab88afdb2a2ebe1 */,
+						{ "cfea3456309664bf8762e3bce5957211f3ee8b39", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3179_to_3889.update2.rpf.hdiff", 429647943 } /* diff sha1: 69fb9dc5716a58942ffff1b7f2e6a878782ff36f */,
+						{ "6e7c1bdd4b0b8d47ac28bef19d2644f3240ad248", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3258_to_3889.update2.rpf.hdiff", 429260477 } /* diff sha1: 76603eea78c45891671a19af8ce92cbece4cf275 */,
+						{ "f2007adb84a8fc9e4481d58faf88ffca3af754c5", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3323_to_3889.update2.rpf.hdiff", 429260483 } /* diff sha1: 47fb90c3c06e0bf0e8c43661e205594ad4d4301c */,
+						{ "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3407_to_3889.update2.rpf.hdiff", 428917858 } /* diff sha1: 6fb47bc9c2158f517039405ce6192d1572b59db3 */,
+						{ "28095c30975ffaead56ff72dfb6418d19eef38dc", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3570_to_3889.update2.rpf.hdiff", 428356486 } /* diff sha1: 9fc1178619cf1e78b89a3c87d2a56c7d0213e1ee */,
+						{ "e67aad3699a50988dd03d201110346e38ebf5225", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3751_to_3889.update2.rpf.hdiff", 427369724 } /* diff sha1: 780563431ae52b8f322d41e0e64c66eaaec9298a */,
+						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "https://cdn.vmp.ir/mirrors/patches_fivem/3889/diffs/from_3788_to_3889.update2.rpf.hdiff", 427369722 } /* diff sha1: 34531507f644f9dc92188f21ca82a722e4e21f8f */
+					},
+				},
+			},
+		}
+	},
+	{
 		3788,
 		{
 			{
@@ -1406,21 +1460,22 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 				{
 					"update/update.rpf", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/update.rpf", 2010816512,
 					{
-						{ "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_1604_to_3788.update.rpf.hdiff", 1517246851 } /* diff sha1: c5192c98ee15dee20ad56b286cabad416e130054 */,
-						{ "736f1cb26e59167f302c22385463d231cce302d3", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_2060_to_3788.update.rpf.hdiff", 1289468906 } /* diff sha1: 4b207375055304a3491f08342a0ccd56e9e4bf01 */,
-						{ "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_2189_to_3788.update.rpf.hdiff", 1247294382 } /* diff sha1: 646a58ecb0936824571642925ab97a8b58ccd5ab */,
-						{ "1824cdbc27c3e0eaa86920a38751322727872831", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_2372_to_3788.update.rpf.hdiff", 1231684939 } /* diff sha1: f553c98ece72cccf29c9167b1a8ffa697762ed46 */,
-						{ "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_2545_to_3788.update.rpf.hdiff", 1093569564 } /* diff sha1: 68b02bcf2c60b49c003daf644cb1f2575e3c531a */,
-						{ "80f9bd028e5bc781f641fe210a88579eff827989", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_2612_to_3788.update.rpf.hdiff", 1093568183 } /* diff sha1: b086516115c4dbab752e9c6902f7e014b797e9dc */,
-						{ "86d88c5ea36e67683a138c0e690c42fe288205fa", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_2699_to_3788.update.rpf.hdiff", 1048755655 } /* diff sha1: 03060b0537f826308e95612eb9a6bb063bd9f3fd */,
-						{ "66388a381347511b7b28aaf91741615e45008e8b", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_2802_to_3788.update.rpf.hdiff", 992333361 } /* diff sha1: a0e7c5110d30b6bb5a1f7c3abaa138e4dd093942 */,
-						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_2944_to_3788.update.rpf.hdiff", 982222965 } /* diff sha1: b5b9bd09d699be40852f7032df7f25a65bf267e1 */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_3095_to_3788.update.rpf.hdiff", 654361091 } /* diff sha1: 0ab4ccb16a59ecd9d340c1902b0854bf9654bc2d */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_3179_to_3788.update.rpf.hdiff", 654361091 } /* diff sha1: 0ab4ccb16a59ecd9d340c1902b0854bf9654bc2d */,
-						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_3258_to_3788.update.rpf.hdiff", 646458713 } /* diff sha1: df3977a7ec8b5b8d3ec7ffa89e46b0195ab661d5 */,
-						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_3323_to_3788.update.rpf.hdiff", 646439748 } /* diff sha1: 8c9b3167cb7cbff4e9a961a71102b389274241db */,
-						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_3407_to_3788.update.rpf.hdiff", 634093722 } /* diff sha1: 7376b10703599ff034fd197164553067e2a8c231 */,
-						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_3570_to_3788.update.rpf.hdiff", 607732534 } /* diff sha1: 6e2c9512a618e7428a64c82110a03d280d134e9b */
+						{ "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_1604_to_3751.update.rpf.hdiff", 1517246851 } /* diff sha1: c5192c98ee15dee20ad56b286cabad416e130054 */,
+						{ "736f1cb26e59167f302c22385463d231cce302d3", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_2060_to_3751.update.rpf.hdiff", 1289468906 } /* diff sha1: 4b207375055304a3491f08342a0ccd56e9e4bf01 */,
+						{ "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_2189_to_3751.update.rpf.hdiff", 1247294382 } /* diff sha1: 646a58ecb0936824571642925ab97a8b58ccd5ab */,
+						{ "1824cdbc27c3e0eaa86920a38751322727872831", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_2372_to_3751.update.rpf.hdiff", 1231684939 } /* diff sha1: f553c98ece72cccf29c9167b1a8ffa697762ed46 */,
+						{ "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_2545_to_3751.update.rpf.hdiff", 1093569564 } /* diff sha1: 68b02bcf2c60b49c003daf644cb1f2575e3c531a */,
+						{ "80f9bd028e5bc781f641fe210a88579eff827989", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_2612_to_3751.update.rpf.hdiff", 1093568183 } /* diff sha1: b086516115c4dbab752e9c6902f7e014b797e9dc */,
+						{ "86d88c5ea36e67683a138c0e690c42fe288205fa", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_2699_to_3751.update.rpf.hdiff", 1048755655 } /* diff sha1: 03060b0537f826308e95612eb9a6bb063bd9f3fd */,
+						{ "66388a381347511b7b28aaf91741615e45008e8b", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_2802_to_3751.update.rpf.hdiff", 992333361 } /* diff sha1: a0e7c5110d30b6bb5a1f7c3abaa138e4dd093942 */,
+						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_2944_to_3751.update.rpf.hdiff", 982222965 } /* diff sha1: b5b9bd09d699be40852f7032df7f25a65bf267e1 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3095_to_3751.update.rpf.hdiff", 654361091 } /* diff sha1: 0ab4ccb16a59ecd9d340c1902b0854bf9654bc2d */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3095_to_3751.update.rpf.hdiff", 654361091 } /* diff sha1: 0ab4ccb16a59ecd9d340c1902b0854bf9654bc2d */,
+						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3258_to_3751.update.rpf.hdiff", 646458713 } /* diff sha1: df3977a7ec8b5b8d3ec7ffa89e46b0195ab661d5 */,
+						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3323_to_3751.update.rpf.hdiff", 646439748 } /* diff sha1: 8c9b3167cb7cbff4e9a961a71102b389274241db */,
+						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3407_to_3751.update.rpf.hdiff", 634093722 } /* diff sha1: 7376b10703599ff034fd197164553067e2a8c231 */,
+						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3570_to_3751.update.rpf.hdiff", 607732534 } /* diff sha1: 6e2c9512a618e7428a64c82110a03d280d134e9b */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3889_to_3751.update.rpf.hdiff", 12642016 } /* diff sha1: 41494bc170d646f44c2a07d295d996b697dbc142 */
 					},
 				},
 			},
@@ -1439,7 +1494,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "f2007adb84a8fc9e4481d58faf88ffca3af754c5", "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_3323_to_3788.update2.rpf.hdiff", 419675473 } /* diff sha1: 1f522c43728380d057238d0a1ca4af270a7aca0c */,
 						{ "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_3407_to_3788.update2.rpf.hdiff", 419314890 } /* diff sha1: 7fdeba907097cd1eefcc2da7f83fcf73598c6131 */,
 						{ "28095c30975ffaead56ff72dfb6418d19eef38dc", "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_3570_to_3788.update2.rpf.hdiff", 418752493 } /* diff sha1: 15dd80ee1e73578661ffa23573e4d36fc59f2085 */,
-						{ "c3c28df9b49dc88bf5dac7ba983e0f7366fd87bd", "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_3717_to_3788.update2.rpf.hdiff", 386205555 } /* diff sha1: b829ca9755a418eec1a758d92e42d9d147724727 */
+						{ "e67aad3699a50988dd03d201110346e38ebf5225", "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_3751_to_3788.update2.rpf.hdiff", 312131424 } /* diff sha1: 52e4c031efebcd420e679c909ad1303f9e48c764 */,
+						{ "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "https://cdn.vmp.ir/mirrors/patches_fivem/3788/diffs/from_3889_to_3788.update2.rpf.hdiff", 417788974 } /* diff sha1: bb9b23af0fe9809d061fae87dd3af494b9f4f729 */
 					},
 				},
 			},
@@ -1467,11 +1523,12 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_2802_to_3751.update.rpf.hdiff", 992333361 } /* diff sha1: a0e7c5110d30b6bb5a1f7c3abaa138e4dd093942 */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_2944_to_3751.update.rpf.hdiff", 982222965 } /* diff sha1: b5b9bd09d699be40852f7032df7f25a65bf267e1 */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3095_to_3751.update.rpf.hdiff", 654361091 } /* diff sha1: 0ab4ccb16a59ecd9d340c1902b0854bf9654bc2d */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3179_to_3751.update.rpf.hdiff", 654361091 } /* diff sha1: 0ab4ccb16a59ecd9d340c1902b0854bf9654bc2d */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3095_to_3751.update.rpf.hdiff", 654361091 } /* diff sha1: 0ab4ccb16a59ecd9d340c1902b0854bf9654bc2d */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3258_to_3751.update.rpf.hdiff", 646458713 } /* diff sha1: df3977a7ec8b5b8d3ec7ffa89e46b0195ab661d5 */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3323_to_3751.update.rpf.hdiff", 646439748 } /* diff sha1: 8c9b3167cb7cbff4e9a961a71102b389274241db */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3407_to_3751.update.rpf.hdiff", 634093722 } /* diff sha1: 7376b10703599ff034fd197164553067e2a8c231 */,
-						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3570_to_3751.update.rpf.hdiff", 607732534 } /* diff sha1: 6e2c9512a618e7428a64c82110a03d280d134e9b */
+						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3570_to_3751.update.rpf.hdiff", 607732534 } /* diff sha1: 6e2c9512a618e7428a64c82110a03d280d134e9b */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3889_to_3751.update.rpf.hdiff", 12642016 } /* diff sha1: 41494bc170d646f44c2a07d295d996b697dbc142 */
 					},
 				},
 			},
@@ -1490,7 +1547,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "f2007adb84a8fc9e4481d58faf88ffca3af754c5", "e67aad3699a50988dd03d201110346e38ebf5225", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3323_to_3751.update2.rpf.hdiff", 419675467 } /* diff sha1: 663a72c6a5142faa76c230ac1832add0da751e4a */,
 						{ "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "e67aad3699a50988dd03d201110346e38ebf5225", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3407_to_3751.update2.rpf.hdiff", 419314898 } /* diff sha1: e81d33ddac1ba0c469ea797b4f4732e8c5ef2154 */,
 						{ "28095c30975ffaead56ff72dfb6418d19eef38dc", "e67aad3699a50988dd03d201110346e38ebf5225", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3570_to_3751.update2.rpf.hdiff", 418749087 } /* diff sha1: d9f6adfaa8cb4d4edcd2a1e6347d9538721a30ae */,
-						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "e67aad3699a50988dd03d201110346e38ebf5225", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3788_to_3751.update2.rpf.hdiff", 312131424 } /* diff sha1: fdd16615910944eaff81f0203626ed54beaea38d */
+						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "e67aad3699a50988dd03d201110346e38ebf5225", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3788_to_3751.update2.rpf.hdiff", 312131424 } /* diff sha1: fdd16615910944eaff81f0203626ed54beaea38d */,
+						{ "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "e67aad3699a50988dd03d201110346e38ebf5225", "https://cdn.vmp.ir/mirrors/patches_fivem/3751/diffs/from_3889_to_3751.update2.rpf.hdiff", 417788977 } /* diff sha1: c08067dcc717997b5aa70148b8bd052a28ac645a */
 					},
 				},
 			},
@@ -1518,12 +1576,13 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "49ed7a6c3d035bcf764942dd58597211448941fd", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_2802_to_3570.update.rpf.hdiff", 436956930 } /* diff sha1: 13a2c664aa130900f5639f29e980b703dbfd1ff3 */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "49ed7a6c3d035bcf764942dd58597211448941fd", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_2944_to_3570.update.rpf.hdiff", 426904985 } /* diff sha1: d5f3c4ddd2852577229d1c84ffbab6dae9ac2eba */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "49ed7a6c3d035bcf764942dd58597211448941fd", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3095_to_3570.update.rpf.hdiff", 98581421 } /* diff sha1: 38d4df53a14c64cf080c29070d7acbcf723ca8c8 */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "49ed7a6c3d035bcf764942dd58597211448941fd", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3179_to_3570.update.rpf.hdiff", 98581421 } /* diff sha1: 38d4df53a14c64cf080c29070d7acbcf723ca8c8 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "49ed7a6c3d035bcf764942dd58597211448941fd", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3095_to_3570.update.rpf.hdiff", 98581421 } /* diff sha1: 38d4df53a14c64cf080c29070d7acbcf723ca8c8 */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "49ed7a6c3d035bcf764942dd58597211448941fd", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3258_to_3570.update.rpf.hdiff", 90104781 } /* diff sha1: 030408ceaef8f2b1a2629e6dcc681d990984052a */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "49ed7a6c3d035bcf764942dd58597211448941fd", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3323_to_3570.update.rpf.hdiff", 90083949 } /* diff sha1: f69bbdb6ae0d72e3907b039bdc2979c387249b54 */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "49ed7a6c3d035bcf764942dd58597211448941fd", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3407_to_3570.update.rpf.hdiff", 77717332 } /* diff sha1: eaf5dd480838f1340088df28e851bc5b89e4d52b */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "49ed7a6c3d035bcf764942dd58597211448941fd", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3751_to_3570.update.rpf.hdiff", 52750371 } /* diff sha1: 9a5f76f976831a31db722f67a52db3e6e657b8df */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "49ed7a6c3d035bcf764942dd58597211448941fd", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3788_to_3570.update.rpf.hdiff", 52750371 } /* diff sha1: 9a5f76f976831a31db722f67a52db3e6e657b8df */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "49ed7a6c3d035bcf764942dd58597211448941fd", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3751_to_3570.update.rpf.hdiff", 52750371 } /* diff sha1: 9a5f76f976831a31db722f67a52db3e6e657b8df */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "49ed7a6c3d035bcf764942dd58597211448941fd", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3889_to_3570.update.rpf.hdiff", 53204940 } /* diff sha1: f06623c5740d351fd3c1cfb84260519f378f9c45 */
 					},
 				},
 			},
@@ -1542,7 +1601,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "f2007adb84a8fc9e4481d58faf88ffca3af754c5", "28095c30975ffaead56ff72dfb6418d19eef38dc", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3323_to_3570.update2.rpf.hdiff", 383273840 } /* diff sha1: 0f5cf045ac35b863104baa8b69e0074603da45a6 */,
 						{ "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "28095c30975ffaead56ff72dfb6418d19eef38dc", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3407_to_3570.update2.rpf.hdiff", 382901098 } /* diff sha1: a3705d9337423df47d944048d96e832b5828eb1a */,
 						{ "e67aad3699a50988dd03d201110346e38ebf5225", "28095c30975ffaead56ff72dfb6418d19eef38dc", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3751_to_3570.update2.rpf.hdiff", 382001828 } /* diff sha1: 619176d571f1fa87c409224ae1e096404ff73f7d */,
-						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "28095c30975ffaead56ff72dfb6418d19eef38dc", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3788_to_3570.update2.rpf.hdiff", 382005234 } /* diff sha1: 2958f3782922a34d17535d11894e7b0adaab9a72 */
+						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "28095c30975ffaead56ff72dfb6418d19eef38dc", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3788_to_3570.update2.rpf.hdiff", 382005234 } /* diff sha1: 2958f3782922a34d17535d11894e7b0adaab9a72 */,
+						{ "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "28095c30975ffaead56ff72dfb6418d19eef38dc", "https://cdn.vmp.ir/mirrors/patches_fivem/3570/diffs/from_3889_to_3570.update2.rpf.hdiff", 382024588 } /* diff sha1: 36bf88796b4d497827ad91e0025c160dbc624138 */
 					},
 				},
 			},
@@ -1570,12 +1630,13 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "f6cdcdec5e3e993a31f45acc96b638283c474f53", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_2802_to_3407.update.rpf.hdiff", 416908267 } /* diff sha1: ee6003ae3e341db66ce1f96a045fbac76762eb0e */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "f6cdcdec5e3e993a31f45acc96b638283c474f53", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_2944_to_3407.update.rpf.hdiff", 403895326 } /* diff sha1: d0a70ae28d789102cd15117fc54ec69dde8470af */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "f6cdcdec5e3e993a31f45acc96b638283c474f53", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3095_to_3407.update.rpf.hdiff", 75132778 } /* diff sha1: 50970d2ba367e464b4814048323f8ce9da36c002 */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "f6cdcdec5e3e993a31f45acc96b638283c474f53", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3179_to_3407.update.rpf.hdiff", 75132778 } /* diff sha1: 50970d2ba367e464b4814048323f8ce9da36c002 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "f6cdcdec5e3e993a31f45acc96b638283c474f53", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3095_to_3407.update.rpf.hdiff", 75132778 } /* diff sha1: 50970d2ba367e464b4814048323f8ce9da36c002 */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "f6cdcdec5e3e993a31f45acc96b638283c474f53", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3258_to_3407.update.rpf.hdiff", 61660313 } /* diff sha1: ff4277c4f4720d360fef08808ff47dd8e5aaf30e */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "f6cdcdec5e3e993a31f45acc96b638283c474f53", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3323_to_3407.update.rpf.hdiff", 61640641 } /* diff sha1: 8d74bafc7b4674cdc5cc4abe6d34607283519ef5 */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "f6cdcdec5e3e993a31f45acc96b638283c474f53", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3570_to_3407.update.rpf.hdiff", 57944658 } /* diff sha1: 82114f25bbd4fc836586e6b47e88bea416c2d6ed */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "f6cdcdec5e3e993a31f45acc96b638283c474f53", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3751_to_3407.update.rpf.hdiff", 59329318 } /* diff sha1: ad6a9fbc7e6680f713d32d5491f3a9f90680a2f3 */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "f6cdcdec5e3e993a31f45acc96b638283c474f53", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3788_to_3407.update.rpf.hdiff", 59329318 } /* diff sha1: ad6a9fbc7e6680f713d32d5491f3a9f90680a2f3 */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "f6cdcdec5e3e993a31f45acc96b638283c474f53", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3751_to_3407.update.rpf.hdiff", 59329318 } /* diff sha1: ad6a9fbc7e6680f713d32d5491f3a9f90680a2f3 */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "f6cdcdec5e3e993a31f45acc96b638283c474f53", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3889_to_3407.update.rpf.hdiff", 59624127 } /* diff sha1: 08df2a3c27de5f8ff4f9fa94829211dda05f20e7 */
 					},
 				},
 			},
@@ -1594,7 +1655,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "f2007adb84a8fc9e4481d58faf88ffca3af754c5", "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3323_to_3407.update2.rpf.hdiff", 364385726 } /* diff sha1: f897b850658b5f1009809bd47faf80049094a513 */,
 						{ "28095c30975ffaead56ff72dfb6418d19eef38dc", "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3570_to_3407.update2.rpf.hdiff", 365504169 } /* diff sha1: afbafc03a8500c36313221f5c88139c6da2301b8 */,
 						{ "e67aad3699a50988dd03d201110346e38ebf5225", "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3751_to_3407.update2.rpf.hdiff", 365167827 } /* diff sha1: 8a6994b85b98a51b5a4cad770315addf85c75cf6 */,
-						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3788_to_3407.update2.rpf.hdiff", 365167825 } /* diff sha1: 18c4b1846c2befe03b4db7a39629329ee80092d1 */
+						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3788_to_3407.update2.rpf.hdiff", 365167825 } /* diff sha1: 18c4b1846c2befe03b4db7a39629329ee80092d1 */,
+						{ "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "https://cdn.vmp.ir/mirrors/patches_fivem/3407/diffs/from_3889_to_3407.update2.rpf.hdiff", 365186147 } /* diff sha1: 947e5f6aa48993959f045c24a6046b9772561cc5 */
 					},
 				},
 			},
@@ -1622,12 +1684,13 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "3633a58585791b30281cec14f90f5ac1e2bfdc57", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_2802_to_3323.update.rpf.hdiff", 406279747 } /* diff sha1: ec590139ddddd6f4c4df2754ce6e96119b022ce4 */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "3633a58585791b30281cec14f90f5ac1e2bfdc57", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_2944_to_3323.update.rpf.hdiff", 393108441 } /* diff sha1: be7846a48dd84f2fe0c75a7693091d69e0674006 */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "3633a58585791b30281cec14f90f5ac1e2bfdc57", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3095_to_3323.update.rpf.hdiff", 63784896 } /* diff sha1: 46d8201479456cf560b74ed95f12557516e75e0d */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "3633a58585791b30281cec14f90f5ac1e2bfdc57", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3179_to_3323.update.rpf.hdiff", 63784896 } /* diff sha1: 46d8201479456cf560b74ed95f12557516e75e0d */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "3633a58585791b30281cec14f90f5ac1e2bfdc57", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3095_to_3323.update.rpf.hdiff", 63784896 } /* diff sha1: 46d8201479456cf560b74ed95f12557516e75e0d */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "3633a58585791b30281cec14f90f5ac1e2bfdc57", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3258_to_3323.update.rpf.hdiff", 232538 } /* diff sha1: 62ba41cf38e55fad1de2e4679787cae91a0dcdd2 */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "3633a58585791b30281cec14f90f5ac1e2bfdc57", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3407_to_3323.update.rpf.hdiff", 52320836 } /* diff sha1: d93db1a27c4fd90f33505e97bc1f3f0a3ff9b19a */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "3633a58585791b30281cec14f90f5ac1e2bfdc57", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3570_to_3323.update.rpf.hdiff", 60991977 } /* diff sha1: 48b0cef83104fa9bd55103890d836a56af2d22a4 */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "3633a58585791b30281cec14f90f5ac1e2bfdc57", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3751_to_3323.update.rpf.hdiff", 62355396 } /* diff sha1: d88fbaa4d01962a60855a5232d90fbf3dbc6a5b6 */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "3633a58585791b30281cec14f90f5ac1e2bfdc57", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3788_to_3323.update.rpf.hdiff", 62355396 } /* diff sha1: d88fbaa4d01962a60855a5232d90fbf3dbc6a5b6 */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "3633a58585791b30281cec14f90f5ac1e2bfdc57", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3751_to_3323.update.rpf.hdiff", 62355396 } /* diff sha1: d88fbaa4d01962a60855a5232d90fbf3dbc6a5b6 */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "3633a58585791b30281cec14f90f5ac1e2bfdc57", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3889_to_3323.update.rpf.hdiff", 62355278 } /* diff sha1: b3754c5f2ccd2c74de49960273f0cb78b35b5745 */
 					},
 				},
 			},
@@ -1646,7 +1709,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "f2007adb84a8fc9e4481d58faf88ffca3af754c5", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3407_to_3323.update2.rpf.hdiff", 340440056 } /* diff sha1: 1f88689b5f532721bb0048b541d0cf8a184134bc */,
 						{ "28095c30975ffaead56ff72dfb6418d19eef38dc", "f2007adb84a8fc9e4481d58faf88ffca3af754c5", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3570_to_3323.update2.rpf.hdiff", 341928123 } /* diff sha1: 2be5d12b696a533cd96dc46536245debaed72d3b */,
 						{ "e67aad3699a50988dd03d201110346e38ebf5225", "f2007adb84a8fc9e4481d58faf88ffca3af754c5", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3751_to_3323.update2.rpf.hdiff", 341581134 } /* diff sha1: 36fde5a36e1454f450ada8cd878117eed8d6e7ae */,
-						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "f2007adb84a8fc9e4481d58faf88ffca3af754c5", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3788_to_3323.update2.rpf.hdiff", 341581140 } /* diff sha1: 6507e366962b85f419cacbcd0ba2745c7656990d */
+						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "f2007adb84a8fc9e4481d58faf88ffca3af754c5", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3788_to_3323.update2.rpf.hdiff", 341581140 } /* diff sha1: 6507e366962b85f419cacbcd0ba2745c7656990d */,
+						{ "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "f2007adb84a8fc9e4481d58faf88ffca3af754c5", "https://cdn.vmp.ir/mirrors/patches_fivem/3323/diffs/from_3889_to_3323.update2.rpf.hdiff", 341581510 } /* diff sha1: 6babc0b352e0e9636913ee78062e31c4bdc2e191 */
 					},
 				},
 			},
@@ -1674,12 +1738,13 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_2802_to_3258.update.rpf.hdiff", 406279730 } /* diff sha1: 7a8216f59fe7fd73409768f273050b1797316087 */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_2944_to_3258.update.rpf.hdiff", 393108418 } /* diff sha1: d5a358eb14bb6ceb0f0cd93a318418b61b225580 */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3095_to_3258.update.rpf.hdiff", 63780343 } /* diff sha1: 7390c645e320807503b25aa86642daa6835c8a09 */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3179_to_3258.update.rpf.hdiff", 63780343 } /* diff sha1: 7390c645e320807503b25aa86642daa6835c8a09 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3095_to_3258.update.rpf.hdiff", 63780343 } /* diff sha1: 7390c645e320807503b25aa86642daa6835c8a09 */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3323_to_3258.update.rpf.hdiff", 232538 } /* diff sha1: 0a8f2f2cedf997b849c571bf9fd7ab0165e81faf */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3407_to_3258.update.rpf.hdiff", 52340312 } /* diff sha1: 5dc9e22f2ec8517a085db8084021ebfef6bab3d7 */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3570_to_3258.update.rpf.hdiff", 61011471 } /* diff sha1: 4c1419e5403e211e43348c278d58d6a78fd75795 */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3751_to_3258.update.rpf.hdiff", 62377432 } /* diff sha1: 7e7d6181e459c7ef3c3f3b5681ac9a6e738ddf09 */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3788_to_3258.update.rpf.hdiff", 62377432 } /* diff sha1: 7e7d6181e459c7ef3c3f3b5681ac9a6e738ddf09 */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3751_to_3258.update.rpf.hdiff", 62377432 } /* diff sha1: 7e7d6181e459c7ef3c3f3b5681ac9a6e738ddf09 */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3889_to_3258.update.rpf.hdiff", 62377290 } /* diff sha1: 046264b9c2291dd8644995b71c2ad49c5450f4ed */
 					},
 				},
 			},
@@ -1698,7 +1763,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "6e7c1bdd4b0b8d47ac28bef19d2644f3240ad248", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3407_to_3258.update2.rpf.hdiff", 340422150 } /* diff sha1: 85134cecbd7c954d8da937650f18dd6c7fc37776 */,
 						{ "28095c30975ffaead56ff72dfb6418d19eef38dc", "6e7c1bdd4b0b8d47ac28bef19d2644f3240ad248", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3570_to_3258.update2.rpf.hdiff", 341925886 } /* diff sha1: dc4c1593a4520bd39cad1e9f725b6cae5d1ea4e4 */,
 						{ "e67aad3699a50988dd03d201110346e38ebf5225", "6e7c1bdd4b0b8d47ac28bef19d2644f3240ad248", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3751_to_3258.update2.rpf.hdiff", 341570891 } /* diff sha1: 5d68a3a81dfc1e7ec09854d9d28efcd5dc1f4d2c */,
-						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "6e7c1bdd4b0b8d47ac28bef19d2644f3240ad248", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3788_to_3258.update2.rpf.hdiff", 341570882 } /* diff sha1: 0a94a28b8cf5a61474a97b8d1a0b3fdff428e7e3 */
+						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "6e7c1bdd4b0b8d47ac28bef19d2644f3240ad248", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3788_to_3258.update2.rpf.hdiff", 341570882 } /* diff sha1: 0a94a28b8cf5a61474a97b8d1a0b3fdff428e7e3 */,
+						{ "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "6e7c1bdd4b0b8d47ac28bef19d2644f3240ad248", "https://cdn.vmp.ir/mirrors/patches_fivem/3258/diffs/from_3889_to_3258.update2.rpf.hdiff", 341571264 } /* diff sha1: ca04ea11031e9eb9ed24894cfb8b8926bc347e2d */
 					},
 				},
 			},
@@ -1716,21 +1782,22 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 				{
 					"update/update.rpf", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/update.rpf", 1416300544,
 					{
-						{ "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_1604_to_3179.update.rpf.hdiff", 923117905 } /* diff sha1: 1b22013721291d5bd65872bd9d179fc01a695fa3 */,
-						{ "736f1cb26e59167f302c22385463d231cce302d3", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_2060_to_3179.update.rpf.hdiff", 694772098 } /* diff sha1: e3e7071607195ebda498e945b07bc174caba90a5 */,
-						{ "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_2189_to_3179.update.rpf.hdiff", 653422887 } /* diff sha1: 7b546f88560c86405cf43c7b4c5bc5c9d0bb4b50 */,
-						{ "1824cdbc27c3e0eaa86920a38751322727872831", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_2372_to_3179.update.rpf.hdiff", 636414267 } /* diff sha1: c04b08faa8eabbf161f4b7b27d44c114738d668c */,
-						{ "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_2545_to_3179.update.rpf.hdiff", 496735908 } /* diff sha1: 4123b2c63d466ee53fb3b8f8e9306bdf44d2d08d */,
-						{ "80f9bd028e5bc781f641fe210a88579eff827989", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_2612_to_3179.update.rpf.hdiff", 496733750 } /* diff sha1: 53ee1f7b28816eed1f9899b7d09a6547ee9fbbb9 */,
-						{ "86d88c5ea36e67683a138c0e690c42fe288205fa", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_2699_to_3179.update.rpf.hdiff", 452905479 } /* diff sha1: 0932832b87a22c963165da8d9cf16b8faede1cd2 */,
-						{ "66388a381347511b7b28aaf91741615e45008e8b", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_2802_to_3179.update.rpf.hdiff", 386841388 } /* diff sha1: c11d4796c020236b173cb01eb99cade83d049319 */,
-						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_2944_to_3179.update.rpf.hdiff", 341954506 } /* diff sha1: 62e7153e824e585739105e3610f16b2518356e64 */,
-						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_3258_to_3179.update.rpf.hdiff", 56823148 } /* diff sha1: 5b581fa05751c05ec24fd92da7c3644d4a234b74 */,
-						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_3323_to_3179.update.rpf.hdiff", 56828311 } /* diff sha1: a3979a12f02688bb65b68a9d86c4d3c5e1990372 */,
-						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_3407_to_3179.update.rpf.hdiff", 58856138 } /* diff sha1: 888c43f4588a63880f8a405c86dfff74f356ca18 */,
-						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_3570_to_3179.update.rpf.hdiff", 62532668 } /* diff sha1: 5b29bd24dfa6c2d2edbeb28b79f0d37c44f8e2f9 */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_3751_to_3179.update.rpf.hdiff", 63322610 } /* diff sha1: 45bef07abe6e6f4e10dab59d255a7cd4b2f3df4b */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_3788_to_3179.update.rpf.hdiff", 63322610 } /* diff sha1: 45bef07abe6e6f4e10dab59d255a7cd4b2f3df4b */
+						{ "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_1604_to_3095.update.rpf.hdiff", 923117905 } /* diff sha1: 1b22013721291d5bd65872bd9d179fc01a695fa3 */,
+						{ "736f1cb26e59167f302c22385463d231cce302d3", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_2060_to_3095.update.rpf.hdiff", 694772098 } /* diff sha1: e3e7071607195ebda498e945b07bc174caba90a5 */,
+						{ "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_2189_to_3095.update.rpf.hdiff", 653422887 } /* diff sha1: 7b546f88560c86405cf43c7b4c5bc5c9d0bb4b50 */,
+						{ "1824cdbc27c3e0eaa86920a38751322727872831", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_2372_to_3095.update.rpf.hdiff", 636414267 } /* diff sha1: c04b08faa8eabbf161f4b7b27d44c114738d668c */,
+						{ "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_2545_to_3095.update.rpf.hdiff", 496735908 } /* diff sha1: 4123b2c63d466ee53fb3b8f8e9306bdf44d2d08d */,
+						{ "80f9bd028e5bc781f641fe210a88579eff827989", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_2612_to_3095.update.rpf.hdiff", 496733750 } /* diff sha1: 53ee1f7b28816eed1f9899b7d09a6547ee9fbbb9 */,
+						{ "86d88c5ea36e67683a138c0e690c42fe288205fa", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_2699_to_3095.update.rpf.hdiff", 452905479 } /* diff sha1: 0932832b87a22c963165da8d9cf16b8faede1cd2 */,
+						{ "66388a381347511b7b28aaf91741615e45008e8b", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_2802_to_3095.update.rpf.hdiff", 386841388 } /* diff sha1: c11d4796c020236b173cb01eb99cade83d049319 */,
+						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_2944_to_3095.update.rpf.hdiff", 341954506 } /* diff sha1: 62e7153e824e585739105e3610f16b2518356e64 */,
+						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3258_to_3095.update.rpf.hdiff", 56823148 } /* diff sha1: 5b581fa05751c05ec24fd92da7c3644d4a234b74 */,
+						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3323_to_3095.update.rpf.hdiff", 56828311 } /* diff sha1: a3979a12f02688bb65b68a9d86c4d3c5e1990372 */,
+						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3407_to_3095.update.rpf.hdiff", 58856138 } /* diff sha1: 888c43f4588a63880f8a405c86dfff74f356ca18 */,
+						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3570_to_3095.update.rpf.hdiff", 62532668 } /* diff sha1: 5b29bd24dfa6c2d2edbeb28b79f0d37c44f8e2f9 */,
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3751_to_3095.update.rpf.hdiff", 63322610 } /* diff sha1: 45bef07abe6e6f4e10dab59d255a7cd4b2f3df4b */,
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3751_to_3095.update.rpf.hdiff", 63322610 } /* diff sha1: 45bef07abe6e6f4e10dab59d255a7cd4b2f3df4b */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3889_to_3095.update.rpf.hdiff", 63370104 } /* diff sha1: 1caa1ae407e0e2d058cb2bb56191af3c8620585b */
 					},
 				},
 			},
@@ -1749,7 +1816,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "cfea3456309664bf8762e3bce5957211f3ee8b39", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_3407_to_3179.update2.rpf.hdiff", 328830163 } /* diff sha1: 9beb88d01a54b6639b16150a635f50fc8019f056 */,
 						{ "28095c30975ffaead56ff72dfb6418d19eef38dc", "cfea3456309664bf8762e3bce5957211f3ee8b39", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_3570_to_3179.update2.rpf.hdiff", 330186263 } /* diff sha1: 15bf0af7ff3bea712df361763fdef18e3bb834e3 */,
 						{ "e67aad3699a50988dd03d201110346e38ebf5225", "cfea3456309664bf8762e3bce5957211f3ee8b39", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_3751_to_3179.update2.rpf.hdiff", 329846475 } /* diff sha1: 2fdfb2807e3c3c555fe1e50326bec581edf293d6 */,
-						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "cfea3456309664bf8762e3bce5957211f3ee8b39", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_3788_to_3179.update2.rpf.hdiff", 329844981 } /* diff sha1: 5eb0980d35ce88055f56ca2a230aefe636533933 */
+						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "cfea3456309664bf8762e3bce5957211f3ee8b39", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_3788_to_3179.update2.rpf.hdiff", 329844981 } /* diff sha1: 5eb0980d35ce88055f56ca2a230aefe636533933 */,
+						{ "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "cfea3456309664bf8762e3bce5957211f3ee8b39", "https://cdn.vmp.ir/mirrors/patches_fivem/3179/diffs/from_3889_to_3179.update2.rpf.hdiff", 329846859 } /* diff sha1: c362175f56ec437c6b56d018e6070484ed36e8e4 */
 					},
 				},
 			},
@@ -1781,7 +1849,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3407_to_3095.update.rpf.hdiff", 58856138 } /* diff sha1: 888c43f4588a63880f8a405c86dfff74f356ca18 */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3570_to_3095.update.rpf.hdiff", 62532668 } /* diff sha1: 5b29bd24dfa6c2d2edbeb28b79f0d37c44f8e2f9 */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3751_to_3095.update.rpf.hdiff", 63322610 } /* diff sha1: 45bef07abe6e6f4e10dab59d255a7cd4b2f3df4b */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3788_to_3095.update.rpf.hdiff", 63322610 } /* diff sha1: 45bef07abe6e6f4e10dab59d255a7cd4b2f3df4b */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3751_to_3095.update.rpf.hdiff", 63322610 } /* diff sha1: 45bef07abe6e6f4e10dab59d255a7cd4b2f3df4b */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "fd46de4495d32f0533b8b3ae72507b829e8650f3", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3889_to_3095.update.rpf.hdiff", 63370104 } /* diff sha1: 1caa1ae407e0e2d058cb2bb56191af3c8620585b */
 					},
 				},
 			},
@@ -1800,7 +1869,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "1c785e7b5cfe8331aad335b3f78952bc66b9fcb6", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3407_to_3095.update2.rpf.hdiff", 328834461 } /* diff sha1: e80010fffe99cdbc8a6f772fb5df3f31d9b024e3 */,
 						{ "28095c30975ffaead56ff72dfb6418d19eef38dc", "1c785e7b5cfe8331aad335b3f78952bc66b9fcb6", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3570_to_3095.update2.rpf.hdiff", 330190382 } /* diff sha1: aa87ea4c9730a2405f4ec0c5ae9409301dfe726c */,
 						{ "e67aad3699a50988dd03d201110346e38ebf5225", "1c785e7b5cfe8331aad335b3f78952bc66b9fcb6", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3751_to_3095.update2.rpf.hdiff", 329850583 } /* diff sha1: 57a58e681842ef5d6da39a0f944c0e748833f3b8 */,
-						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "1c785e7b5cfe8331aad335b3f78952bc66b9fcb6", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3788_to_3095.update2.rpf.hdiff", 329850582 } /* diff sha1: 555339cca02594ae6e9fb007ff5d8b35298c0a5d */
+						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "1c785e7b5cfe8331aad335b3f78952bc66b9fcb6", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3788_to_3095.update2.rpf.hdiff", 329850582 } /* diff sha1: 555339cca02594ae6e9fb007ff5d8b35298c0a5d */,
+						{ "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "1c785e7b5cfe8331aad335b3f78952bc66b9fcb6", "https://cdn.vmp.ir/mirrors/patches_fivem/3095/diffs/from_3889_to_3095.update2.rpf.hdiff", 329850939 } /* diff sha1: fce53d085d9bd305d708c8ac8dd73bc8111ea243 */
 					},
 				},
 			},
@@ -1827,13 +1897,14 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "86d88c5ea36e67683a138c0e690c42fe288205fa", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_2699_to_2944.update.rpf.hdiff", 121830364 } /* diff sha1: 3e3b0549f13e0debbc37cfab480a2b902316c199 */,
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_2802_to_2944.update.rpf.hdiff", 56081281 } /* diff sha1: eb75888e835e3ef58aa736cbb36747194b0eeea6 */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3095_to_2944.update.rpf.hdiff", 15617655 } /* diff sha1: 5b98a4a7ff869b724d477d03b5b4bd7037468b74 */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3179_to_2944.update.rpf.hdiff", 15617655 } /* diff sha1: 5b98a4a7ff869b724d477d03b5b4bd7037468b74 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3095_to_2944.update.rpf.hdiff", 15617655 } /* diff sha1: 5b98a4a7ff869b724d477d03b5b4bd7037468b74 */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3258_to_2944.update.rpf.hdiff", 59814458 } /* diff sha1: 6877cf0cac02ee1ce085e500cb9a3530617aa63d */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3323_to_2944.update.rpf.hdiff", 59814456 } /* diff sha1: e6767ca11d311070115de3ffb64c0841a1a7770e */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3407_to_2944.update.rpf.hdiff", 61283961 } /* diff sha1: 45c360e0da0f8bf9bc782a30480405f30c36f4b9 */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3570_to_2944.update.rpf.hdiff", 64517668 } /* diff sha1: 687efe95a79426d04e9fefee5f3de4341070cd4c */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3751_to_2944.update.rpf.hdiff", 64847231 } /* diff sha1: 13a9aa0d7aaafe897153d063c4bff1abc28c4450 */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3788_to_2944.update.rpf.hdiff", 64847231 } /* diff sha1: 13a9aa0d7aaafe897153d063c4bff1abc28c4450 */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3751_to_2944.update.rpf.hdiff", 64847231 } /* diff sha1: 13a9aa0d7aaafe897153d063c4bff1abc28c4450 */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3889_to_2944.update.rpf.hdiff", 64885368 } /* diff sha1: cf6a3a486592fc174c5762dcf7f30aaf365142c6 */
 					},
 				},
 			},
@@ -1852,7 +1923,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "a3181d68a532950da5c584100b35f79eaca7c884", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3407_to_2944.update2.rpf.hdiff", 279136123 } /* diff sha1: da11233b54ec1924a73504e9763bf1a272a50b5d */,
 						{ "28095c30975ffaead56ff72dfb6418d19eef38dc", "a3181d68a532950da5c584100b35f79eaca7c884", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3570_to_2944.update2.rpf.hdiff", 279581616 } /* diff sha1: b916d5abfede87b084aac0db14ae7f7b2672b5e9 */,
 						{ "e67aad3699a50988dd03d201110346e38ebf5225", "a3181d68a532950da5c584100b35f79eaca7c884", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3751_to_2944.update2.rpf.hdiff", 279190411 } /* diff sha1: 55a76eea71fc935d802ff53c245984dd1758b4a4 */,
-						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "a3181d68a532950da5c584100b35f79eaca7c884", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3788_to_2944.update2.rpf.hdiff", 279190414 } /* diff sha1: b07bd6d9e0f563dd8ed3b3fc3b0ea557222dc65b */
+						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "a3181d68a532950da5c584100b35f79eaca7c884", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3788_to_2944.update2.rpf.hdiff", 279190414 } /* diff sha1: b07bd6d9e0f563dd8ed3b3fc3b0ea557222dc65b */,
+						{ "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "a3181d68a532950da5c584100b35f79eaca7c884", "https://cdn.vmp.ir/mirrors/patches_fivem/2944/diffs/from_3889_to_2944.update2.rpf.hdiff", 279190748 } /* diff sha1: b1aa242fb76b6e3be0b7843cfc3439e7ad5d8346 */
 					},
 				},
 			},
@@ -1879,13 +1951,14 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "86d88c5ea36e67683a138c0e690c42fe288205fa", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_2699_to_2802.update.rpf.hdiff", 107750632 } /* diff sha1: ef20902617372028b4caac304b42d38a5d3eec8d */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_2944_to_2802.update.rpf.hdiff", 48422944 } /* diff sha1: 8baed7a1e37c6cc37be64e6ba5ebae246c2087dc */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3095_to_2802.update.rpf.hdiff", 52843554 } /* diff sha1: 19a5a38d4cc02ec5b086dcd8999cd83bed81e145 */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3179_to_2802.update.rpf.hdiff", 52843554 } /* diff sha1: 19a5a38d4cc02ec5b086dcd8999cd83bed81e145 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3095_to_2802.update.rpf.hdiff", 52843554 } /* diff sha1: 19a5a38d4cc02ec5b086dcd8999cd83bed81e145 */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3258_to_2802.update.rpf.hdiff", 65327489 } /* diff sha1: 9dcfaf73965e139e6420b3049205fdc792654167 */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3323_to_2802.update.rpf.hdiff", 65327479 } /* diff sha1: 36b634accceba01c1f42e227ded30ed40d9bfd23 */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3407_to_2802.update.rpf.hdiff", 66636258 } /* diff sha1: b15cb1871bbd077d01559603d1b1e29aba3be90f */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3570_to_2802.update.rpf.hdiff", 66909639 } /* diff sha1: 076df60c0ecf01f7bf5e9bbc4fd1d032ad6a78b7 */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3751_to_2802.update.rpf.hdiff", 67298012 } /* diff sha1: a0e2f861f0d598ec34ca373485b3ae1ca95e5db5 */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3788_to_2802.update.rpf.hdiff", 67298012 } /* diff sha1: a0e2f861f0d598ec34ca373485b3ae1ca95e5db5 */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3751_to_2802.update.rpf.hdiff", 67298012 } /* diff sha1: a0e2f861f0d598ec34ca373485b3ae1ca95e5db5 */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "66388a381347511b7b28aaf91741615e45008e8b", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3889_to_2802.update.rpf.hdiff", 67297568 } /* diff sha1: cbee0566959e9130ea0c45bb53dc2d664f62b927 */
 					},
 				},
 			},
@@ -1904,7 +1977,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "c7de68bdc56ec4577bd4fce5d85cca9a4d529839", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3407_to_2802.update2.rpf.hdiff", 271939214 } /* diff sha1: cfec1f3ea06183161491b210670efba2206d5fa5 */,
 						{ "28095c30975ffaead56ff72dfb6418d19eef38dc", "c7de68bdc56ec4577bd4fce5d85cca9a4d529839", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3570_to_2802.update2.rpf.hdiff", 272401850 } /* diff sha1: fda8061b6d044e590ca9d90d66737206f7d2eddf */,
 						{ "e67aad3699a50988dd03d201110346e38ebf5225", "c7de68bdc56ec4577bd4fce5d85cca9a4d529839", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3751_to_2802.update2.rpf.hdiff", 271977853 } /* diff sha1: 6d9086c2ec1bd6150c51e8a7a07ab20712186865 */,
-						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "c7de68bdc56ec4577bd4fce5d85cca9a4d529839", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3788_to_2802.update2.rpf.hdiff", 271977851 } /* diff sha1: a3b9c34047937bd4663d3b9cd5b2d75b8036eb7a */
+						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "c7de68bdc56ec4577bd4fce5d85cca9a4d529839", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3788_to_2802.update2.rpf.hdiff", 271977851 } /* diff sha1: a3b9c34047937bd4663d3b9cd5b2d75b8036eb7a */,
+						{ "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "c7de68bdc56ec4577bd4fce5d85cca9a4d529839", "https://cdn.vmp.ir/mirrors/patches_fivem/2802/diffs/from_3889_to_2802.update2.rpf.hdiff", 271978153 } /* diff sha1: f2cdf475b09530847acef907ac5356ee6777eee2 */
 					},
 				},
 			},
@@ -1931,13 +2005,14 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_2802_to_2699.update.rpf.hdiff", 102324935 } /* diff sha1: 9e52c963dd498af0abe560241673e2e9963d917f */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_2944_to_2699.update.rpf.hdiff", 108745603 } /* diff sha1: 590e601cbc82f332f7619b78dbb93a3d72d7c741 */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3095_to_2699.update.rpf.hdiff", 113480643 } /* diff sha1: f57949a6c14e71cfa119d7aacb128796c8fcd2e3 */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3179_to_2699.update.rpf.hdiff", 113480643 } /* diff sha1: f57949a6c14e71cfa119d7aacb128796c8fcd2e3 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3095_to_2699.update.rpf.hdiff", 113480643 } /* diff sha1: f57949a6c14e71cfa119d7aacb128796c8fcd2e3 */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3258_to_2699.update.rpf.hdiff", 116581930 } /* diff sha1: ade215b3b763433132d0636948ae0af442a5fdfc */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3323_to_2699.update.rpf.hdiff", 116581929 } /* diff sha1: c6cd8ce18160bbc2f10a3bf8753f78772b740a9f */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3407_to_2699.update.rpf.hdiff", 117825124 } /* diff sha1: e9c7233f506d7ada6fe127c4f538c246b2cd4181 */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3570_to_2699.update.rpf.hdiff", 118068195 } /* diff sha1: de55a1cc50e6b47b683c28322bff40cfce602aaa */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3751_to_2699.update.rpf.hdiff", 118291533 } /* diff sha1: c3b2c59022f00ac3e2d0de7dfefc3eca5934f8de */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3788_to_2699.update.rpf.hdiff", 118291533 } /* diff sha1: c3b2c59022f00ac3e2d0de7dfefc3eca5934f8de */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3751_to_2699.update.rpf.hdiff", 118291533 } /* diff sha1: c3b2c59022f00ac3e2d0de7dfefc3eca5934f8de */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "86d88c5ea36e67683a138c0e690c42fe288205fa", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3889_to_2699.update.rpf.hdiff", 118330125 } /* diff sha1: 5d798c4bad2659a2cc835445e2ca637ae7a414ef */
 					},
 				},
 			},
@@ -1956,7 +2031,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "414a04256bf0b00b78324478508a6beaea1ef5a7", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3407_to_2699.update2.rpf.hdiff", 252158158 } /* diff sha1: 8c234441726c7c434907ad4b38fc7ac031379f40 */,
 						{ "28095c30975ffaead56ff72dfb6418d19eef38dc", "414a04256bf0b00b78324478508a6beaea1ef5a7", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3570_to_2699.update2.rpf.hdiff", 252609115 } /* diff sha1: 281a29db0f8efd02c1c5ade6e16be12d024bbfbf */,
 						{ "e67aad3699a50988dd03d201110346e38ebf5225", "414a04256bf0b00b78324478508a6beaea1ef5a7", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3751_to_2699.update2.rpf.hdiff", 252195942 } /* diff sha1: ba863f41e6b1e55d3a05ab64d9b38a94b0b5353f */,
-						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "414a04256bf0b00b78324478508a6beaea1ef5a7", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3788_to_2699.update2.rpf.hdiff", 252195954 } /* diff sha1: 1ebbf147cb4116b2c5c19a3717bef6248c748b7c */
+						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "414a04256bf0b00b78324478508a6beaea1ef5a7", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3788_to_2699.update2.rpf.hdiff", 252195954 } /* diff sha1: 1ebbf147cb4116b2c5c19a3717bef6248c748b7c */,
+						{ "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "414a04256bf0b00b78324478508a6beaea1ef5a7", "https://cdn.vmp.ir/mirrors/patches_fivem/2699/diffs/from_3889_to_2699.update2.rpf.hdiff", 252196380 } /* diff sha1: 2041ad9513e47a9101cf6a1638c6cc03fe2085f8 */
 					},
 				},
 			},
@@ -1983,13 +2059,14 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_2802_to_2612.update.rpf.hdiff", 131292485 } /* diff sha1: 586b0f78de285133a3234cea71ae87a29174b825 */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_2944_to_2612.update.rpf.hdiff", 136386970 } /* diff sha1: 69a7f2dfa365deee03f273cd45edfef63887d414 */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3095_to_2612.update.rpf.hdiff", 140238453 } /* diff sha1: ec4226c26fe0ab951a064dafc8953d2cf7cd9071 */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3179_to_2612.update.rpf.hdiff", 140238453 } /* diff sha1: ec4226c26fe0ab951a064dafc8953d2cf7cd9071 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3095_to_2612.update.rpf.hdiff", 140238453 } /* diff sha1: ec4226c26fe0ab951a064dafc8953d2cf7cd9071 */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3258_to_2612.update.rpf.hdiff", 144229149 } /* diff sha1: 13ff3b3e6c80627fed2039877f245e05574c1ffc */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3323_to_2612.update.rpf.hdiff", 144229138 } /* diff sha1: ccf193169dd665ef4105911fb370d96260a142ab */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3407_to_2612.update.rpf.hdiff", 145561398 } /* diff sha1: f1e075150bb219126533b6d1097af78543254802 */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3570_to_2612.update.rpf.hdiff", 145733983 } /* diff sha1: 2f7d2241e291c51f1216e2c87328818604d7428a */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3751_to_2612.update.rpf.hdiff", 146033459 } /* diff sha1: 80308693f8f248a6d2b6aa4ad89f6dd4fc60318d */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3788_to_2612.update.rpf.hdiff", 146033459 } /* diff sha1: 80308693f8f248a6d2b6aa4ad89f6dd4fc60318d */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3751_to_2612.update.rpf.hdiff", 146033459 } /* diff sha1: 80308693f8f248a6d2b6aa4ad89f6dd4fc60318d */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "80f9bd028e5bc781f641fe210a88579eff827989", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3889_to_2612.update.rpf.hdiff", 146033047 } /* diff sha1: fc41080a0d7ef450de352794dc3b0659a7a23505 */
 					},
 				},
 			},
@@ -2008,7 +2085,8 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "b379e1752718ea1d799194b8aa70b58b28cd8c5f", "c993e2d14cce9462fa8ba056f3406d60050a1c92", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3407_to_2612.update2.rpf.hdiff", 241528234 } /* diff sha1: 883af320813e26fe4b0139327cc16a197828597d */,
 						{ "28095c30975ffaead56ff72dfb6418d19eef38dc", "c993e2d14cce9462fa8ba056f3406d60050a1c92", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3570_to_2612.update2.rpf.hdiff", 241971051 } /* diff sha1: 135778e8df16fd241bc1957e85020182f3a38884 */,
 						{ "e67aad3699a50988dd03d201110346e38ebf5225", "c993e2d14cce9462fa8ba056f3406d60050a1c92", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3751_to_2612.update2.rpf.hdiff", 241556042 } /* diff sha1: 763fd47174e0a190bca324adfab0254f5c030d6b */,
-						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "c993e2d14cce9462fa8ba056f3406d60050a1c92", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3788_to_2612.update2.rpf.hdiff", 241556045 } /* diff sha1: 3ab445405457e4557fe65da4bc99429a14492fa7 */
+						{ "995aecbc44438ed75ae4048c4e365a937eb6c4c1", "c993e2d14cce9462fa8ba056f3406d60050a1c92", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3788_to_2612.update2.rpf.hdiff", 241556045 } /* diff sha1: 3ab445405457e4557fe65da4bc99429a14492fa7 */,
+						{ "c58c1df3e3562ca4396c9eb2913f453dc6da36af", "c993e2d14cce9462fa8ba056f3406d60050a1c92", "https://cdn.vmp.ir/mirrors/patches_fivem/2612/diffs/from_3889_to_2612.update2.rpf.hdiff", 241556484 } /* diff sha1: 6d12cc2ff67c5736ea6bf800ac36c4879fb80e1c */
 					},
 				},
 			},
@@ -2035,13 +2113,14 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_2802_to_2545.update.rpf.hdiff", 441227939 } /* diff sha1: 23df563de60020ec4edb6192ab4925ae67af2ae6 */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_2944_to_2545.update.rpf.hdiff", 446324800 } /* diff sha1: 0eef4d6c08abd9834bf306ac4e172033bac0f694 */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_3095_to_2545.update.rpf.hdiff", 450172651 } /* diff sha1: 483f1b9d493818afe9fe32d01aa23d265b2f5cd7 */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_3179_to_2545.update.rpf.hdiff", 450172651 } /* diff sha1: 483f1b9d493818afe9fe32d01aa23d265b2f5cd7 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_3095_to_2545.update.rpf.hdiff", 450172651 } /* diff sha1: 483f1b9d493818afe9fe32d01aa23d265b2f5cd7 */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_3258_to_2545.update.rpf.hdiff", 454165325 } /* diff sha1: 63f68a67be0eb06b7ec00cdda882ef07e6d57b28 */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_3323_to_2545.update.rpf.hdiff", 454165319 } /* diff sha1: 3f501ce62c7a3856406101a2a35ee2e133fa618a */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_3407_to_2545.update.rpf.hdiff", 455494428 } /* diff sha1: 182b01aea1eddf8277e2847e83fdeea79d4abb08 */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_3570_to_2545.update.rpf.hdiff", 455668062 } /* diff sha1: d2e00cbc299de083c72dd2e8ddcd3dd61772c3bd */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_3751_to_2545.update.rpf.hdiff", 455969203 } /* diff sha1: fd8cc84ba3ef52ce21d8b1d699b3f4d996aa4389 */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_3788_to_2545.update.rpf.hdiff", 455969203 } /* diff sha1: fd8cc84ba3ef52ce21d8b1d699b3f4d996aa4389 */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_3751_to_2545.update.rpf.hdiff", 455969203 } /* diff sha1: fd8cc84ba3ef52ce21d8b1d699b3f4d996aa4389 */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "2993b3c30f61cbbb8dbce859604d7fb717ff8dae", "https://cdn.vmp.ir/mirrors/patches_fivem/2545/diffs/from_3889_to_2545.update.rpf.hdiff", 455968681 } /* diff sha1: e7a087ed097da28759d4a3edc6c560f5f10201c9 */
 					},
 				},
 			},
@@ -2068,13 +2147,14 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_2802_to_2372.update.rpf.hdiff", 349288020 } /* diff sha1: 2b83c01cbcfa112e62882159b7178527b3aaffe5 */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_2944_to_2372.update.rpf.hdiff", 354164718 } /* diff sha1: 6699a31eb6be4b331d52383322079139aa2e8968 */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_3095_to_2372.update.rpf.hdiff", 356862631 } /* diff sha1: 6aa88c4943d6e36071b9ede4bd9b9652b5f76d14 */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_3179_to_2372.update.rpf.hdiff", 356862631 } /* diff sha1: 6aa88c4943d6e36071b9ede4bd9b9652b5f76d14 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_3095_to_2372.update.rpf.hdiff", 356862631 } /* diff sha1: 6aa88c4943d6e36071b9ede4bd9b9652b5f76d14 */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_3258_to_2372.update.rpf.hdiff", 359924636 } /* diff sha1: ecd71f547ba9d45088c61cb80c0981bf173db964 */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_3323_to_2372.update.rpf.hdiff", 359924634 } /* diff sha1: b8f623b99c598fcaaf7f669741c29dee8c629346 */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_3407_to_2372.update.rpf.hdiff", 360756556 } /* diff sha1: f86f62cb0123fa5e03dce616baa13496d55afdf3 */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_3570_to_2372.update.rpf.hdiff", 360941691 } /* diff sha1: 99db2ed3e7d40352e6d341c62ff03f558f8f0b14 */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_3751_to_2372.update.rpf.hdiff", 361097173 } /* diff sha1: a0712f7271e62f1bbf1a20d6e9c173b80956776b */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_3788_to_2372.update.rpf.hdiff", 361097173 } /* diff sha1: a0712f7271e62f1bbf1a20d6e9c173b80956776b */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_3751_to_2372.update.rpf.hdiff", 361097173 } /* diff sha1: a0712f7271e62f1bbf1a20d6e9c173b80956776b */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "1824cdbc27c3e0eaa86920a38751322727872831", "https://cdn.vmp.ir/mirrors/patches_fivem/2372/diffs/from_3889_to_2372.update.rpf.hdiff", 361096506 } /* diff sha1: 1aeba6a347a1877297023b6676fdbf9023b742ae */
 					},
 				},
 			},
@@ -2101,13 +2181,14 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_2802_to_2189.update.rpf.hdiff", 513356064 } /* diff sha1: 0dbfc1422fe085d4654311358cf47204ae8360b9 */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_2944_to_2189.update.rpf.hdiff", 518134363 } /* diff sha1: 23cb0ec2ad7aed1f58bd64ce37c1f7c1d7e590ad */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_3095_to_2189.update.rpf.hdiff", 518604133 } /* diff sha1: 73b7e835643658012708e6c280eb24c354fa2b0b */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_3179_to_2189.update.rpf.hdiff", 518604133 } /* diff sha1: 73b7e835643658012708e6c280eb24c354fa2b0b */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_3095_to_2189.update.rpf.hdiff", 518604133 } /* diff sha1: 73b7e835643658012708e6c280eb24c354fa2b0b */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_3258_to_2189.update.rpf.hdiff", 521239366 } /* diff sha1: ab61a067d7afaab16e4769def84d6c0588bb7bd4 */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_3323_to_2189.update.rpf.hdiff", 521239331 } /* diff sha1: 2875855cfc9d2aebd7aaeac7536a2548c8136bca */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_3407_to_2189.update.rpf.hdiff", 522046015 } /* diff sha1: aafcccc2747d58e468e4b00b2fca2db9c4225411 */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_3570_to_2189.update.rpf.hdiff", 522170835 } /* diff sha1: 5c21932f630ad903d8e28f156af21d3e61b6769d */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_3751_to_2189.update.rpf.hdiff", 521487114 } /* diff sha1: adfaf3e2ab4ed35216611f4a64f23de435dd5ff4 */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_3788_to_2189.update.rpf.hdiff", 521487114 } /* diff sha1: adfaf3e2ab4ed35216611f4a64f23de435dd5ff4 */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_3751_to_2189.update.rpf.hdiff", 521487114 } /* diff sha1: adfaf3e2ab4ed35216611f4a64f23de435dd5ff4 */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "fe387dbc0f700d690b53d44ce1226c624c24b8fc", "https://cdn.vmp.ir/mirrors/patches_fivem/2189/diffs/from_3889_to_2189.update.rpf.hdiff", 521492140 } /* diff sha1: 61e20c53fd7c7cf6592e9302692f5b346c9bcc9c */
 					},
 				},
 			},
@@ -2134,13 +2215,14 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_2802_to_2060.update.rpf.hdiff", 508501688 } /* diff sha1: 02d1f7276d1f93fcc204d7b7e1e31db7058a33ca */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_2944_to_2060.update.rpf.hdiff", 512509365 } /* diff sha1: d69b4ba86899e0692217d4173ba1ba68f6816908 */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_3095_to_2060.update.rpf.hdiff", 512663221 } /* diff sha1: 8fccc8eecc4e44533eac1b8be577dc4260224ec2 */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_3179_to_2060.update.rpf.hdiff", 512663221 } /* diff sha1: 8fccc8eecc4e44533eac1b8be577dc4260224ec2 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_3095_to_2060.update.rpf.hdiff", 512663221 } /* diff sha1: 8fccc8eecc4e44533eac1b8be577dc4260224ec2 */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_3258_to_2060.update.rpf.hdiff", 515246812 } /* diff sha1: 535f49a489f7c3618a0174f514c017851bb4f7fd */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_3323_to_2060.update.rpf.hdiff", 515246794 } /* diff sha1: bfcf008b95313770edc03662a16d30b7bb245f26 */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_3407_to_2060.update.rpf.hdiff", 516145143 } /* diff sha1: 64b91a5a8d6cef3364f5d2d1d26036f351d403a9 */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_3570_to_2060.update.rpf.hdiff", 516214365 } /* diff sha1: ce7630d66372d701af6dcc610f4e3b793b316495 */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_3751_to_2060.update.rpf.hdiff", 516323686 } /* diff sha1: d2c274c424e36d17f30d02245c32673cead39a6a */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_3788_to_2060.update.rpf.hdiff", 516323686 } /* diff sha1: d2c274c424e36d17f30d02245c32673cead39a6a */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_3751_to_2060.update.rpf.hdiff", 516323686 } /* diff sha1: d2c274c424e36d17f30d02245c32673cead39a6a */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "736f1cb26e59167f302c22385463d231cce302d3", "https://cdn.vmp.ir/mirrors/patches_fivem/2060/diffs/from_3889_to_2060.update.rpf.hdiff", 516323421 } /* diff sha1: b286fb0b686393c818268c1b66a7907737bf1acb */
 					},
 				},
 			},
@@ -2167,13 +2249,14 @@ static std::map<int, std::map<std::string, GameCacheEntry>> g_entriesToLoadPerBu
 						{ "66388a381347511b7b28aaf91741615e45008e8b", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_2802_to_1604.update.rpf.hdiff", 478650625 } /* diff sha1: 8f8ad96b2939ddf43c9c014af3592a396330f4d4 */,
 						{ "abc628b0ae04e68f88e0581f3572d26dbaed84d2", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_2944_to_1604.update.rpf.hdiff", 481127813 } /* diff sha1: ed3677dc68d2c1db95a90b3fd184ef8ed1c82d0c */,
 						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_3095_to_1604.update.rpf.hdiff", 481316317 } /* diff sha1: 4cdcfc8e677169799861f5a97247bc7152d75768 */,
-						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_3179_to_1604.update.rpf.hdiff", 481316317 } /* diff sha1: 4cdcfc8e677169799861f5a97247bc7152d75768 */,
+						{ "fd46de4495d32f0533b8b3ae72507b829e8650f3", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_3095_to_1604.update.rpf.hdiff", 481316317 } /* diff sha1: 4cdcfc8e677169799861f5a97247bc7152d75768 */,
 						{ "abf3a580ddfc4cb372b5a4ce48ed7b2ea31e5270", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_3258_to_1604.update.rpf.hdiff", 483477046 } /* diff sha1: dc84f0bd06326be309bd4b409c354903690ac196 */,
 						{ "3633a58585791b30281cec14f90f5ac1e2bfdc57", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_3323_to_1604.update.rpf.hdiff", 483477045 } /* diff sha1: 4a826e8ab5034b13835c5e303cce9b2f9a718b77 */,
 						{ "f6cdcdec5e3e993a31f45acc96b638283c474f53", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_3407_to_1604.update.rpf.hdiff", 484276041 } /* diff sha1: fa5c1ba46ab12fb57aad511f20bc712518a20c0f */,
 						{ "49ed7a6c3d035bcf764942dd58597211448941fd", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_3570_to_1604.update.rpf.hdiff", 484285949 } /* diff sha1: 2107e0cea4a3a40c1e95243b5c535684a12d7069 */,
 						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_3751_to_1604.update.rpf.hdiff", 484294097 } /* diff sha1: cb44e563041743f303b25066d17cef5740882bc1 */,
-						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_3788_to_1604.update.rpf.hdiff", 484294097 } /* diff sha1: cb44e563041743f303b25066d17cef5740882bc1 */
+						{ "4d475df8caa95cb99aedcb0b555a3f83f8acf60c", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_3751_to_1604.update.rpf.hdiff", 484294097 } /* diff sha1: cb44e563041743f303b25066d17cef5740882bc1 */,
+						{ "31cbd81373475d5407c20058733ea910cadce13b", "fc941d698834e30e40a06a40f6a35b1b18e1c50c", "https://cdn.vmp.ir/mirrors/patches_fivem/1604/diffs/from_3889_to_1604.update.rpf.hdiff", 484297827 } /* diff sha1: 8f7d6a0880e675f8345c116da6302a8f7a03c917 */
 					},
 				},
 			},
@@ -2300,8 +2383,9 @@ std::map<std::string, std::string> UpdateGameCache()
 	// cross-build toggle
 #ifdef GTA_FIVE
 
-	// We always use the effective default game build executable. Older build behavior is achieved by loading DLC content.
-	if (GetTargetGameBuild() >= GetEffectiveDefault())
+	// Either the feature flag for the new build system with single executable is not set.
+	// Or we are loading the game build that does not require any overrides.
+	if (GetTargetGameBuild() >= GetDefaultBuild())
 	{
 		for (auto [_, entry]: g_entriesToLoadPerBuild[GetTargetGameBuild()])
 		{
@@ -2310,8 +2394,8 @@ std::map<std::string, std::string> UpdateGameCache()
 	}
 	else
 	{
-		// Download files for the effective default executable build because that's what we run regardless of the requested version.
-		for (auto [_, entry]: g_entriesToLoadPerBuild[GetEffectiveDefault()])
+		// Download files for the default executable build because that's what we run regardless of the requested version.
+		for (auto [_, entry]: g_entriesToLoadPerBuild[GetDefaultBuild()])
 		{
 			g_requiredEntries.push_back(entry);
 		}
@@ -2367,12 +2451,12 @@ std::map<std::string, std::string> UpdateGameCache()
 
 	if (IsTargetGameBuildOrGreater<2944>())
 	{
-		g_requiredEntries.push_back({ "update/x64/dlcpacks/mp2023_02/dlc.rpf", "22afecbf20f46f1a871f442b2822b120bb41fbbf", "https://cdn.vmp.ir/patches/dlcpacks/mp2023_02/dlc.rpf", 1604741120 });
+		g_requiredEntries.push_back({ "update/x64/dlcpacks/mp2023_01/dlc.rpf", "11519d20c34a5f34d06252078b41e28275dbc67b", "nope:https://cdn.vmp.ir/patches/dlcpacks/patchday4ng/dlc.rpfmpbiker/dlc.rpf", 809424896 });
 	}
 
 	if (IsTargetGameBuildOrGreater<3095>())
 	{
-		g_requiredEntries.push_back({ "update/x64/dlcpacks/mp2023_02/dlc.rpf", "22afecbf20f46f1a871f442b2822b120bb41fbbf", "https://cdn.vmp.ir/patches/dlcpacks/mp2023_02/dlc.rpf", 1604741120 });
+		g_requiredEntries.push_back({ "update/x64/dlcpacks/mp2023_02/dlc.rpf", "22afecbf20f46f1a871f442b2822b120bb41fbbf", "nope:https://cdn.vmp.ir/patches/dlcpacks/patchday4ng/dlc.rpfmpbiker/dlc.rpf", 1604741120 });
 	}
 
 	if (IsTargetGameBuildOrGreater<3258>())
@@ -2393,6 +2477,11 @@ std::map<std::string, std::string> UpdateGameCache()
 	if (IsTargetGameBuildOrGreater<xbr::Build::Winter_2025>())
 	{
 		g_requiredEntries.push_back({ "update/x64/dlcpacks/mp2025_02/dlc.rpf", "EB3F51A0A99F9E2653A5C3F28208FF348CDD2942", "nope:https://cdn.vmp.ir/patches/dlcpacks/patchday4ng/dlc.rpfmpbiker/dlc.rpf", 1905895424 });
+	}
+
+	if (IsTargetGameBuildOrGreater<xbr::Build::Summer_2026>())
+	{
+		g_requiredEntries.push_back({ "update/x64/dlcpacks/mp2026_01/dlc.rpf", "252FD77A7E865EE061D52F720248D69C53BFE32A", "nope:https://cdn.vmp.ir/patches/dlcpacks/patchday4ng/dlc.rpfmpbiker/dlc.rpf", 938670080 });
 	}
 #elif IS_RDR3
 	for (auto [_, entry]: g_entriesToLoadPerBuild[GetTargetGameBuild()])

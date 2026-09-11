@@ -143,8 +143,8 @@ struct InfoHttpHandlerComponentLocals : fwRefCountable
 	std::shared_ptr<ConsoleCommand> crashCmd;
 	int paranoiaLevel = 0;
 	std::shared_ptr<ConVar<int>> paranoiaVar;
-	std::shared_ptr<ConVar<bool>> epPrivacy;
-	std::shared_ptr<ConVar<bool>> exposePlayerIdentifiersInHttpEndpoint;
+	std::shared_ptr<ConVar<bool>> deprecatedEndpointPrivacyVar;
+	std::shared_ptr<ConVar<bool>> deprecatedExposePlayerIdentifiersVar;
 	std::shared_ptr<InfoData> infoData;
 	std::shared_ptr<ConsoleCommand> iconCmd;
 
@@ -177,8 +177,26 @@ void InfoHttpHandlerComponentLocals::AttachToObject(fx::ServerInstanceBase* inst
 	});
 	paranoiaLevel = 0;
 	paranoiaVar = instance->AddVariable<int>("sv_requestParanoia", ConVar_None, 0, &paranoiaLevel);
-	epPrivacy = instance->AddVariable<bool>("sv_endpointPrivacy", ConVar_None, true);
-	exposePlayerIdentifiersInHttpEndpoint = instance->AddVariable<bool>("sv_exposePlayerIdentifiersInHttpEndpoint", ConVar_None, false);
+
+	deprecatedEndpointPrivacyVar = instance->AddVariable<bool>("sv_endpointPrivacy", ConVar_None, false);
+	deprecatedExposePlayerIdentifiersVar = instance->AddVariable<bool>("sv_exposePlayerIdentifiersInHttpEndpoint", ConVar_None, false);
+
+	instance->OnInitialConfiguration.Connect([this]()
+	{
+		if (deprecatedEndpointPrivacyVar->GetValue())
+		{
+			console::PrintWarning("server",
+				"`sv_endpointPrivacy` has been removed. Player endpoint addresses are no longer exposed on any HTTP endpoint. "
+				"Please remove this ConVar from your server configuration.\n");
+		}
+
+		if (deprecatedExposePlayerIdentifiersVar->GetValue())
+		{
+			console::PrintWarning("server",
+				"`sv_exposePlayerIdentifiersInHttpEndpoint` has been removed. Player names and identifiers are only exposed on `/players.json` when the request is authenticated via `sv_playersToken` (using the `X-Players-Token` header or `?token=` query parameter). "
+				"Please remove this ConVar from your server configuration.\n");
+		}
+	});
 
 	auto processRequestParanoia = [this](const fwRefContainer<net::HttpRequest>& request)
 	{
@@ -416,9 +434,6 @@ void InfoHttpHandlerComponentLocals::AttachToObject(fx::ServerInstanceBase* inst
 		json data = json::array();
 		json publicData = json::array();
 
-		bool showEndpoint = !epPrivacy->GetValue();
-		const bool hidePlayerIdentifiers = !exposePlayerIdentifiersInHttpEndpoint->GetValue();
-
 		clientRegistry->ForAllClients([&](const fx::ClientSharedPtr& client)
 		{
 			if (!client->HasConnected())
@@ -426,52 +441,35 @@ void InfoHttpHandlerComponentLocals::AttachToObject(fx::ServerInstanceBase* inst
 				return;
 			}
 
-			auto identifiers = client->GetIdentifiers();
-			if (!showEndpoint)
-			{
-				auto newEnd = std::remove_if(identifiers.begin(), identifiers.end(), [](const std::string& identifier)
-				{
-					return (identifier.find("ip:") == 0);
-				});
-
-				identifiers.erase(newEnd, identifiers.end());
-			}
-
 			fx::NetPeerStackBuffer stackBuffer;
 			gscomms_get_peer(client->GetPeer(), stackBuffer);
 			auto peer = stackBuffer.GetBase();
 
-			auto playerData = json::object({
-				{ "endpoint", (showEndpoint) ? client->GetAddress().ToString() : "127.0.0.1" },
-				{ "id", client->GetNetId() },
+			const int netId = client->GetNetId();
+			const int ping = peer ? peer->GetPing() : -1;
+
+			// Anonymized payload: served to every unauthenticated consumer (public /players.json, heartbeat/ingress).
+			publicData.push_back(json::object({
+				{ "endpoint", "127.0.0.1" },
+				{ "id", 0 },
 				{ "identifiers", json::array() },
+				{ "name", "Player" },
+				{ "ping", 0 }
+			}));
+
+			// Private payload: only served on /players.json when sv_playersToken matches the X-Players-Token header or ?token= query.
+			data.push_back(json::object({
+				{ "endpoint", "127.0.0.1" },
+				{ "id", netId },
+				{ "identifiers", client->GetIdentifiers() },
 				{ "name", client->GetName() },
-				{ "ping", peer ? peer->GetPing() : -1 }
-			});
-
-			// pushes the player data without identifiers to the public api
-			publicData.push_back(playerData);
-
-			auto privatePlayerData = playerData;
-
-			// adds the identifiers
-			privatePlayerData["identifiers"] = identifiers;
-
-			// pushes the player data with identifiers to the private api
-			data.push_back(privatePlayerData);
+				{ "ping", ping }
+			}));
 		});
 
 		std::unique_lock<std::shared_mutex> lock(playerBlobMutex);
 		playerBlob = data.dump(-1, ' ', false, json::error_handler_t::replace);
-
-		if (hidePlayerIdentifiers)
-		{
-			publicPlayerBlob = publicData.dump(-1, ' ', false, json::error_handler_t::replace);
-		}
-		else
-		{
-			publicPlayerBlob = playerBlob;
-		}
+		publicPlayerBlob = publicData.dump(-1, ' ', false, json::error_handler_t::replace);
 	});
 
 	static std::optional<json> lastProfile;
@@ -553,12 +551,12 @@ json InfoHttpHandlerComponentLocals::GetPlayersJson()
 {
 	std::shared_lock<std::shared_mutex> lock(playerBlobMutex);
 
-	if (playerBlob.empty())
+	if (publicPlayerBlob.empty())
 	{
 		return json::array();
 	}
 
-	return json::parse(playerBlob);
+	return json::parse(publicPlayerBlob);
 }
 
 json InfoHttpHandlerComponentLocals::GetDynamicJson()
