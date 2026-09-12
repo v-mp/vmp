@@ -18,6 +18,10 @@
 
 #include <chrono>
 
+#define VMP_ALLOW_CFX_NUCLEUS 0
+
+#if VMP_ALLOW_CFX_NUCLEUS
+
 extern fwEvent<fx::MonitorInstance*> OnMonitorTick;
 
 inline auto msec()
@@ -145,3 +149,5 @@ static InitFunction initFunction([]()
 		});
 	});
 });
+
+#endif // VMP_ALLOW_CFX_NUCLEUS

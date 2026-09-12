@@ -18,6 +18,10 @@
 
 #include <chrono>
 
+#define VMP_ALLOW_CFX_NUCLEUS 0
+
+#if VMP_ALLOW_CFX_NUCLEUS
+
 // 100KiB cap, conditional notices should fit more than comfortably under this limit
 #define MAX_NOTICE_FILESIZE 102400
 
@@ -153,3 +157,5 @@ static InitFunction initFunction([]()
 		});
 	}, INT32_MAX);
 });
+
+#endif // VMP_ALLOW_CFX_NUCLEUS
