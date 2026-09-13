@@ -37,6 +37,7 @@ return {
 
                 buildoutputs {
                     ('%%{cfg.targetdir}/%s'):format(dllName),
+                    ('%s/%s'):format(uvBinDir, libName),
                 }
 
                 buildcommands {
