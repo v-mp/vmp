@@ -193,11 +193,11 @@ void NVSP_DisableOnStartup()
 
 				while (*GetShadowPlayStatus(*nvConn))
 				{
-					Sleep(100);
+					Sleep(10);
 
-					if (attempts > 30)
+					if (attempts > 300)
 					{
-						trace("Waited 30x for ShadowPlay to be disabled, continuing anyway.\n");
+						trace("Waited 300x for ShadowPlay to be disabled, continuing anyway.\n");
 						break;
 					}
 

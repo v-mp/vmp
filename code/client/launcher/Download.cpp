@@ -947,6 +947,8 @@ int DL_RequestURL(const char* url, char* buffer, size_t bufSize, HttpHeaderListP
 		curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
 		curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
 		curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, g_curlError);
+		curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
+		curl_easy_setopt(curl, CURLOPT_TIMEOUT, 15);
 
 		if (getenv("CFX_CURL_DEBUG"))
 		{

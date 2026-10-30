@@ -236,7 +236,8 @@ void Bootstrap_ReplaceExecutable(const wchar_t* fileName, const std::wstring& pa
 			return;
 		}
 
-		Sleep(50);
+		// reduced sleep to 5ms to speed up retries
+		Sleep(5);
 	}
 
 	// move the file
