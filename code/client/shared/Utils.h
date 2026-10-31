@@ -297,6 +297,10 @@ std::string ToNarrow(std::wstring_view wide);
 extern "C" bool DLL_EXPORT CoreIsDebuggerPresent();
 extern "C" void DLL_EXPORT CoreSetDebuggerPresent();
 extern "C" void DLL_EXPORT CoreTrace(const char* channel, const char* func, const char* file, int line, const char* string);
+#if defined(_WIN32) && !defined(IS_FXSERVER)
+extern "C" void DLL_EXPORT FlushCrashLog();
+extern "C" void DLL_EXPORT SyncCriticalTrace(const char* string);
+#endif
 #elif _WIN32
 inline bool CoreIsDebuggerPresent()
 {
@@ -335,6 +339,46 @@ inline void CoreTrace(const char* channel, const char* funcName, const char* fil
 
 	(func) ? func(channel, funcName, file, line, string) : (void)0;
 }
+
+#ifndef IS_FXSERVER
+inline void FlushCrashLog()
+{
+	using TFunc = void(*)();
+
+	static TFunc func;
+
+	if (!func)
+	{
+		func = (TFunc)GetProcAddress(GetModuleHandleW(NULL), "FlushCrashLog");
+
+		if (!func)
+		{
+			func = (TFunc)GetProcAddress(GetModuleHandleW(L"CoreRT.dll"), "FlushCrashLog");
+		}
+	}
+
+	(func) ? func() : (void)0;
+}
+
+inline void SyncCriticalTrace(const char* string)
+{
+	using TFunc = void(*)(const char*);
+
+	static TFunc func;
+
+	if (!func)
+	{
+		func = (TFunc)GetProcAddress(GetModuleHandleW(NULL), "SyncCriticalTrace");
+
+		if (!func)
+		{
+			func = (TFunc)GetProcAddress(GetModuleHandleW(L"CoreRT.dll"), "SyncCriticalTrace");
+		}
+	}
+
+	(func) ? func(string) : (void)0;
+}
+#endif
 #else
 inline bool CoreIsDebuggerPresent()
 {

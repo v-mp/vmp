@@ -339,18 +339,42 @@ void Printfv(ConsoleChannel channel, std::string_view format, fmt::printf_args a
 		boost::algorithm::replace_all(buffer, std::string_view{ "\0", 1 }, "^5<\\0>^7");
 	}
 
-	// run print filter
-	if (!gConsole->printFilter(channel, buffer.data()))
-	{
-		return;
-	}
+	// run print filter (on-screen only — file log always keeps the line)
+	const bool filteredOut = !gConsole->printFilter(channel, buffer.data());
 
 	gConsole->UpdateActionMask(channel);
 
-	if (gConsole->actionMask & ActionMask_Drop)
+	const bool dropped = (gConsole->actionMask & ActionMask_Drop) != 0;
+
+#ifdef _WIN32
+	if (filteredOut || dropped)
+	{
+		using TAsyncTrace = void(*)(const char*);
+		static TAsyncTrace asyncTrace;
+
+		if (!asyncTrace)
+		{
+			asyncTrace = (TAsyncTrace)GetProcAddress(GetModuleHandleW(NULL), "AsyncTrace");
+
+			if (!asyncTrace)
+			{
+				asyncTrace = (TAsyncTrace)GetProcAddress(GetModuleHandleW(L"CoreRT.dll"), "AsyncTrace");
+			}
+		}
+
+		if (asyncTrace)
+		{
+			asyncTrace(buffer.c_str());
+		}
+
+		return;
+	}
+#else
+	if (filteredOut || dropped)
 	{
 		return;
 	}
+#endif
 
 	// print to all interested listeners
 	for (auto& listener : gConsole->printListeners)

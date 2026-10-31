@@ -917,6 +917,9 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 
 	CrashGenerationServer::OnClientDumpRequestCallback dumpCallback = [] (void*, const ClientInfo* info, const std::wstring* filePath)
 	{
+		trace("--- DumpServer received crash dump request path=%s ---\n",
+			filePath ? ToNarrow(*filePath).c_str() : "(null)");
+
 		PruneCrashDumps();
 
 		// we're going to be reporting, make a new event
@@ -1812,6 +1815,20 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 
 	CrashGenerationServer::OnClientExitedCallback exitCallback = [] (void*, const ClientInfo* info)
 	{
+		DWORD exitCode = 0;
+		DWORD pid = 0;
+		HANDLE process = info ? info->process_handle() : nullptr;
+
+		if (process)
+		{
+			GetExitCodeProcess(process, &exitCode);
+			pid = GetProcessId(process);
+		}
+
+		trace("--- DumpServer client exited pid=%lu exitCode=0x%08lX dumps=%lu ---\n",
+			pid,
+			exitCode,
+			numCrashReports);
 	};
 
 	CrashGenerationServer::OnClientUploadRequestCallback uploadCallback = [] (void*, DWORD)
@@ -1833,6 +1850,18 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 		}
 
 		WaitForSingleObject(parentProcess, INFINITE);
+
+		DWORD parentExitCode = 0;
+		GetExitCodeProcess(parentProcess, &parentExitCode);
+
+		if (numCrashReports == 0)
+		{
+			trace("--- DumpServer parent exited WITHOUT crash dump exitCode=0x%08lX (silent/clean exit or uncaught kill) ---\n", parentExitCode);
+		}
+		else
+		{
+			trace("--- DumpServer parent exited after %lu crash report(s) exitCode=0x%08lX ---\n", numCrashReports, parentExitCode);
+		}
 
 		if (numCrashReports > 0)
 		{

@@ -56,6 +56,34 @@ extern "C" DLL_EXPORT void EarlyInitializeExceptionHandler()
 
 extern "C" DLL_EXPORT bool TerminateForException(PEXCEPTION_POINTERS exception)
 {
+	__try
+	{
+		auto flush = (void(*)())GetProcAddress(GetModuleHandleW(NULL), "FlushCrashLog");
+		auto syncTrace = (void(*)(const char*))GetProcAddress(GetModuleHandleW(NULL), "SyncCriticalTrace");
+
+		if (syncTrace)
+		{
+			char line[512] = { "--- CRASH TerminateForException ---\n" };
+
+			if (exception && exception->ExceptionRecord)
+			{
+				_snprintf_s(line, _TRUNCATE, "--- CRASH TerminateForException code=0x%08lX addr=%p ---\n",
+					exception->ExceptionRecord->ExceptionCode,
+					exception->ExceptionRecord->ExceptionAddress);
+			}
+
+			syncTrace(line);
+		}
+
+		if (flush)
+		{
+			flush();
+		}
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+	}
+
 	if (g_exceptionHandler)
 	{
 		return g_exceptionHandler->WriteMinidumpForException(exception);
@@ -140,6 +168,22 @@ extern "C" DLL_EXPORT DWORD WINAPI BeforeTerminateHandler(LPVOID arg)
 {
 	__try
 	{
+		auto syncTrace = (void(*)(const char*))GetProcAddress(GetModuleHandleW(NULL), "SyncCriticalTrace");
+		auto flush = (void(*)())GetProcAddress(GetModuleHandleW(NULL), "FlushCrashLog");
+
+		if (syncTrace)
+		{
+			const char* reason = arg ? static_cast<const char*>(arg) : "(null)";
+			char line[1024];
+			_snprintf_s(line, _TRUNCATE, "--- CRASH BeforeTerminateHandler: %s ---\n", reason);
+			syncTrace(line);
+		}
+
+		if (flush)
+		{
+			flush();
+		}
+
 		auto coreRt = GetModuleHandleW(L"CoreRT.dll");
 
 		if (coreRt)
@@ -150,6 +194,11 @@ extern "C" DLL_EXPORT DWORD WINAPI BeforeTerminateHandler(LPVOID arg)
 			{
 				func(arg);
 			}
+		}
+
+		if (flush)
+		{
+			flush();
 		}
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER)

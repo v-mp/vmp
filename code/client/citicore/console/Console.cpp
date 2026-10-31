@@ -628,12 +628,34 @@ void SetConsoleWriter(console::IWriter* writer)
 
 #ifdef _WIN32
 static void(*g_asyncTrace)(const char*);
+static void(*g_syncCriticalTrace)(const char*);
+static void(*g_flushCrashLog)();
 
 extern "C" DLL_EXPORT void AsyncTrace(const char* string)
 {
 	if (g_asyncTrace)
 	{
 		g_asyncTrace(string);
+	}
+}
+
+extern "C" DLL_EXPORT void SyncCriticalTrace(const char* string)
+{
+	if (g_syncCriticalTrace)
+	{
+		g_syncCriticalTrace(string);
+	}
+	else if (g_asyncTrace)
+	{
+		g_asyncTrace(string);
+	}
+}
+
+extern "C" DLL_EXPORT void FlushCrashLog()
+{
+	if (g_flushCrashLog)
+	{
+		g_flushCrashLog();
 	}
 }
 
@@ -646,6 +668,8 @@ static InitFunction initFunction([]()
 {
 #ifdef _WIN32
 	g_asyncTrace = (decltype(g_asyncTrace))GetProcAddress(GetModuleHandle(NULL), "AsyncTrace");
+	g_syncCriticalTrace = (decltype(g_syncCriticalTrace))GetProcAddress(GetModuleHandle(NULL), "SyncCriticalTrace");
+	g_flushCrashLog = (decltype(g_flushCrashLog))GetProcAddress(GetModuleHandle(NULL), "FlushCrashLog");
 
 	CoreAddPrintListener([](ConsoleChannel channel, const char* message)
 	{
