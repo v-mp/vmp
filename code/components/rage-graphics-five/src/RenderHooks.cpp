@@ -15,6 +15,7 @@
 #include <MinHook.h>
 
 #include <Error.h>
+#include <Utils.h>
 
 #include <CrossBuildRuntime.h>
 #include <CL2LaunchMode.h>
@@ -1622,9 +1623,15 @@ static void DisplayD3DCrashMessageWrap(HRESULT hr)
 		}
 
 		removedError = ToNarrow(fmt::sprintf(L"\nGetDeviceRemovedReason returned %s - %s", removedString, errorBuffer.get()));
+
+		SyncCriticalTrace(fmt::sprintf("--- CRASH GPU/TDR DXGI_ERROR_DEVICE_REMOVED reason=%s ---\n", ToNarrow(removedString)).c_str());
+		FlushCrashLog();
 	}
 
 	auto errorBody = fmt::sprintf("%s - %s%s", ToNarrow(errorString), ToNarrow(errorBuffer.get()), removedError);
+
+	SyncCriticalTrace(fmt::sprintf("--- CRASH DirectX hr=0x%08lX %s ---\n", hr, errorBody).c_str());
+	FlushCrashLog();
 
 	std::set<std::string> mods;
 	auto getMod = [&mods](const std::string& filename)

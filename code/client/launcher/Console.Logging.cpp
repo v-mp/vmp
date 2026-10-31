@@ -4,9 +4,25 @@
 #include <filesystem>
 #include <fmt/chrono.h>
 #include <io.h>
+#include <new.h>
+#include <signal.h>
+#include <Psapi.h>
 
 #include <HostSharedData.h>
 #include "TickCountData.h"
+
+#ifndef STATUS_HEAP_CORRUPTION
+#define STATUS_HEAP_CORRUPTION ((DWORD)0xC0000374L)
+#endif
+#ifndef STATUS_STACK_BUFFER_OVERRUN
+#define STATUS_STACK_BUFFER_OVERRUN ((DWORD)0xC0000409L)
+#endif
+#ifndef STATUS_FATAL_APP_EXIT
+#define STATUS_FATAL_APP_EXIT ((DWORD)0x40000015L)
+#endif
+#ifndef STATUS_NO_MEMORY
+#define STATUS_NO_MEMORY ((DWORD)0xC0000017L)
+#endif
 
 static constexpr uint64_t kLogRetentionTicks = 2 * 24 * 60 * 60 * uint64_t(10000000);
 
@@ -109,6 +125,8 @@ static void EnsureLogFileOpen_Locked()
 	{
 		return;
 	}
+
+	CreateDirectoryW(MakeRelativeCitPath(L"logs/").c_str(), nullptr);
 
 	auto* fp = GetLogFilePath();
 	g_logFile = _wfopen(fp->c_str(), L"ab");
@@ -382,9 +400,246 @@ static void PruneOldLogs()
 	FindClose(hFind);
 }
 
+static void EmergencyWrite(const char* msg)
+{
+	if (!msg)
+	{
+		return;
+	}
+
+	AcquireSRWLockExclusive(&g_fileLogMutex);
+	EnsureLogFileOpen_Locked();
+
+	if (g_logFileHandle != INVALID_HANDLE_VALUE)
+	{
+		DWORD written = 0;
+		WriteFile(g_logFileHandle, msg, static_cast<DWORD>(strlen(msg)), &written, nullptr);
+		FlushFileBuffers(g_logFileHandle);
+	}
+
+	ReleaseSRWLockExclusive(&g_fileLogMutex);
+}
+
+static void LogMemorySnapshot(const char* tag)
+{
+	MEMORYSTATUSEX status = { sizeof(status) };
+	GlobalMemoryStatusEx(&status);
+
+	PROCESS_MEMORY_COUNTERS_EX pmc = {};
+	pmc.cb = sizeof(pmc);
+	GetProcessMemoryInfo(GetCurrentProcess(), reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&pmc), sizeof(pmc));
+
+	char line[640];
+	_snprintf_s(line, _TRUNCATE,
+		"--- MEM %s load=%lu%% physAvailMB=%llu physTotalMB=%llu pageAvailMB=%llu workingSetMB=%llu privateMB=%llu ---\n",
+		tag ? tag : "?",
+		status.dwMemoryLoad,
+		status.ullAvailPhys / (1024ull * 1024ull),
+		status.ullTotalPhys / (1024ull * 1024ull),
+		status.ullAvailPageFile / (1024ull * 1024ull),
+		static_cast<unsigned long long>(pmc.WorkingSetSize / (1024ull * 1024ull)),
+		static_cast<unsigned long long>(pmc.PrivateUsage / (1024ull * 1024ull)));
+
+	SyncCriticalTrace(line);
+}
+
+static LONG CALLBACK CrashDiagnosticsVEH(PEXCEPTION_POINTERS info)
+{
+	if (!info || !info->ExceptionRecord)
+	{
+		return EXCEPTION_CONTINUE_SEARCH;
+	}
+
+	const DWORD code = info->ExceptionRecord->ExceptionCode;
+	const char* name = nullptr;
+
+	switch (code)
+	{
+		case EXCEPTION_STACK_OVERFLOW:
+			name = "STACK_OVERFLOW";
+			break;
+		case EXCEPTION_IN_PAGE_ERROR:
+			name = "IN_PAGE_ERROR";
+			break;
+		case STATUS_HEAP_CORRUPTION:
+			name = "HEAP_CORRUPTION";
+			break;
+		case STATUS_STACK_BUFFER_OVERRUN:
+			name = "STACK_BUFFER_OVERRUN_FASTFAIL";
+			break;
+		case STATUS_NO_MEMORY:
+			name = "NO_MEMORY";
+			break;
+		case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+			name = "ARRAY_BOUNDS";
+			break;
+		case EXCEPTION_ILLEGAL_INSTRUCTION:
+			name = "ILLEGAL_INSTRUCTION";
+			break;
+		case EXCEPTION_PRIV_INSTRUCTION:
+			name = "PRIV_INSTRUCTION";
+			break;
+		case EXCEPTION_DATATYPE_MISALIGNMENT:
+			name = "DATATYPE_MISALIGNMENT";
+			break;
+		case STATUS_FATAL_APP_EXIT:
+			name = "FATAL_APP_EXIT";
+			break;
+		default:
+			return EXCEPTION_CONTINUE_SEARCH;
+	}
+
+	char line[512];
+	_snprintf_s(line, _TRUNCATE,
+		"--- CRASH %s code=0x%08lX addr=%p tid=%lu ---\r\n",
+		name,
+		code,
+		info->ExceptionRecord->ExceptionAddress,
+		GetCurrentThreadId());
+
+	if (code == EXCEPTION_STACK_OVERFLOW)
+	{
+		EmergencyWrite(line);
+	}
+	else
+	{
+		if (code == STATUS_NO_MEMORY || code == EXCEPTION_IN_PAGE_ERROR)
+		{
+			LogMemorySnapshot(name);
+		}
+
+		SyncCriticalTrace(line);
+		FlushCrashLog();
+	}
+
+	return EXCEPTION_CONTINUE_SEARCH;
+}
+
+static int OnNewFailed(size_t)
+{
+	LogMemorySnapshot("OOM_new_handler");
+	SyncCriticalTrace("--- CRASH OOM: operator new/malloc allocation failed ---\n");
+	FlushCrashLog();
+	return 0;
+}
+
+static void OnInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t)
+{
+	const auto exprN = expression ? ToNarrow(expression) : std::string{ "(null)" };
+	const auto funcN = function ? ToNarrow(function) : std::string{ "(null)" };
+	const auto fileN = file ? ToNarrow(file) : std::string{ "(null)" };
+
+	char buf[768];
+	_snprintf_s(buf, _TRUNCATE,
+		"--- CRASH CRT invalid_parameter expr=%s func=%s file=%s line=%u ---\n",
+		exprN.c_str(),
+		funcN.c_str(),
+		fileN.c_str(),
+		line);
+	SyncCriticalTrace(buf);
+	FlushCrashLog();
+}
+
+static void OnPureCall()
+{
+	SyncCriticalTrace("--- CRASH CRT pure virtual call ---\n");
+	FlushCrashLog();
+}
+
+static void OnAbortSignal(int)
+{
+	SyncCriticalTrace("--- CRASH SIGABRT/abort ---\n");
+	FlushCrashLog();
+}
+
+static DWORD WINAPI MemoryWatchThread(LPVOID)
+{
+	SetThreadName(-1, "[Cfx] MemWatch");
+
+	LogMemorySnapshot("startup");
+
+	HANDLE lowMem = CreateMemoryResourceNotification(LowMemoryResourceNotification);
+	ULONGLONG lastHeartbeat = GetTickCount64();
+	ULONGLONG lastHighLoadLog = 0;
+
+	for (;;)
+	{
+		DWORD waitResult = WAIT_TIMEOUT;
+
+		if (lowMem)
+		{
+			waitResult = WaitForSingleObject(lowMem, 30000);
+		}
+		else
+		{
+			Sleep(30000);
+		}
+
+		if (waitResult == WAIT_OBJECT_0)
+		{
+			LogMemorySnapshot("LOW_MEMORY_WARNING");
+			SyncCriticalTrace("--- WARN system low-memory notification (OOM/commit risk) ---\n");
+			FlushCrashLog();
+			Sleep(5000);
+		}
+
+		MEMORYSTATUSEX status = { sizeof(status) };
+		GlobalMemoryStatusEx(&status);
+
+		const ULONGLONG now = GetTickCount64();
+
+		if (status.dwMemoryLoad >= 92 && (now - lastHighLoadLog) > 60000)
+		{
+			LogMemorySnapshot("HIGH_MEMORY_LOAD");
+			FlushCrashLog();
+			lastHighLoadLog = now;
+		}
+
+		if ((now - lastHeartbeat) >= (5ull * 60ull * 1000ull))
+		{
+			LogMemorySnapshot("heartbeat");
+			lastHeartbeat = now;
+		}
+	}
+
+	return 0;
+}
+
+static void InstallExtendedCrashDiagnostics()
+{
+	static INIT_ONCE once = INIT_ONCE_STATIC_INIT;
+	BOOL pending = FALSE;
+
+	if (!InitOnceBeginInitialize(&once, 0, &pending, nullptr))
+	{
+		return;
+	}
+
+	if (!pending)
+	{
+		return;
+	}
+
+	AddVectoredExceptionHandler(1, CrashDiagnosticsVEH);
+
+	_set_new_handler(OnNewFailed);
+	_set_new_mode(1);
+	_set_invalid_parameter_handler(OnInvalidParameter);
+	_set_purecall_handler(OnPureCall);
+	signal(SIGABRT, OnAbortSignal);
+
+	CreateThread(nullptr, 0, MemoryWatchThread, nullptr, 0, nullptr);
+
+	AsyncTrace("--- Extended crash diagnostics enabled (OOM/low-mem/stack/heap/fastfail/CRT/abort + 5m mem heartbeat) ---\n");
+
+	InitOnceComplete(&once, 0, nullptr);
+}
+
 void InitLogging()
 {
 	SetThreadName(-1, "MainThrd");
+
+	InstallExtendedCrashDiagnostics();
 
 	if (OpenMutex(SYNCHRONIZE, FALSE, L"CitizenFX_LogMutex_Mod") == nullptr)
 	{
