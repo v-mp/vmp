@@ -62,6 +62,43 @@ static void LogUnhandledException(EXCEPTION_POINTERS* ptrs, const char* tag)
 	FlushCrashLog();
 }
 
+static void LogLocalStackTrace(const char* tag)
+{
+	void* frames[32] = {};
+	USHORT captured = CaptureStackBackTrace(2, static_cast<DWORD>(std::size(frames)), frames, nullptr);
+
+	char line[768];
+	_snprintf_s(line, _TRUNCATE, "--- STACK %s frames=%u ---\n", tag, captured);
+	SyncCriticalTrace(line);
+
+	for (USHORT i = 0; i < captured; ++i)
+	{
+		HMODULE mod = nullptr;
+		char modulePath[MAX_PATH] = { "unknown" };
+		DWORD flags = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
+
+		if (GetModuleHandleExA(flags, reinterpret_cast<LPCSTR>(frames[i]), &mod) && mod)
+		{
+			GetModuleFileNameA(mod, modulePath, std::size(modulePath));
+		}
+
+		const char* baseName = modulePath;
+		if (auto slash = strrchr(modulePath, '\\'))
+		{
+			baseName = slash + 1;
+		}
+
+		uintptr_t offset = 0;
+		if (mod)
+		{
+			offset = reinterpret_cast<uintptr_t>(frames[i]) - reinterpret_cast<uintptr_t>(mod);
+		}
+
+		_snprintf_s(line, _TRUNCATE, "  #%02u %s+%X (%p)\n", i, baseName, static_cast<unsigned>(offset), frames[i]);
+		SyncCriticalTrace(line);
+	}
+}
+
 static BOOL (WINAPI* g_origTerminateProcess)(HANDLE, UINT);
 static BOOL WINAPI TerminateProcessHook(HANDLE hProcess, UINT uExitCode)
 {
@@ -81,6 +118,12 @@ static BOOL WINAPI TerminateProcessHook(HANDLE hProcess, UINT uExitCode)
 		char line[256];
 		_snprintf_s(line, _TRUNCATE, "--- PROCESS TerminateProcess exitCode=0x%08X tid=%lu ---\n", uExitCode, GetCurrentThreadId());
 		SyncCriticalTrace(line);
+
+		if (uExitCode != 0)
+		{
+			LogLocalStackTrace("TerminateProcess");
+		}
+
 		FlushCrashLog();
 	}
 

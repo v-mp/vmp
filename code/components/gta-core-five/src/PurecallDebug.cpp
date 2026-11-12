@@ -9,6 +9,7 @@
 #include "Hooking.h"
 
 #include <Error.h>
+#include <Utils.h>
 #include <CrossBuildRuntime.h>
 
 #include <CustomRtti.h>
@@ -32,6 +33,9 @@ static void PurecallHandler(void* self)
 
 		moduleBaseString = va(" - %s+%X", strrchr(filename, '\\') + 1, (char*)_ReturnAddress() - (char*)module);
 	}
+
+	SyncCriticalTrace(fmt::sprintf("--- CRASH purecall type=%s from=%p%s ---\n", typeName, _ReturnAddress(), moduleBaseString).c_str());
+	FlushCrashLog();
 
 	// format a fatal error message with the right data
 	FatalError("Pure virtual function call in GTA function (type %s, called from %p%s)", typeName, _ReturnAddress(), moduleBaseString);
