@@ -7,6 +7,7 @@
 
 #include "StdInc.h"
 #include <Error.h>
+#include <Utils.h>
 
 #if defined(COMPILING_LAUNCH) && !defined(LAUNCHER_PERSONALITY_MAIN) && !defined(COMPILING_DIAG)
 #define NON_CRT_LAUNCHER
@@ -109,6 +110,14 @@ static int SysError(const char* buffer)
 #ifdef WIN32
 	HWND wnd = CoreGetGameWindow();
 
+#if !defined(IS_FXSERVER)
+	{
+		std::string line = std::string("--- FATAL SysError: ") + buffer + "\n";
+		SyncCriticalTrace(line.c_str());
+		FlushCrashLog();
+	}
+#endif
+
 #if !defined(COMPILING_LAUNCH) && !defined(COMPILING_CONSOLE)
 	if (CoreIsDebuggerPresent())
 #else
@@ -131,6 +140,7 @@ static int SysError(const char* buffer)
 		if (MinidumpInitialized())
 #endif
 		{
+			FlushCrashLog();
 			return -1;
 		}
 	}
@@ -151,6 +161,9 @@ static int SysError(const char* buffer)
 #endif
 #endif
 
+#if !defined(IS_FXSERVER)
+	FlushCrashLog();
+#endif
 	TerminateProcess(GetCurrentProcess(), 1);
 #else
 	fprintf(stderr, "%s", buffer);
@@ -165,6 +178,14 @@ static int SysErrorNoReport(const char* buffer)
 {
 #ifdef WIN32
 	HWND wnd = CoreGetGameWindow();
+
+#if !defined(IS_FXSERVER)
+	{
+		std::string line = std::string("--- FATAL SysErrorNoReport: ") + buffer + "\n";
+		SyncCriticalTrace(line.c_str());
+		FlushCrashLog();
+	}
+#endif
 
 #if !defined(COMPILING_LAUNCH) && !defined(COMPILING_CONSOLE)
 	if (CoreIsDebuggerPresent())
@@ -188,6 +209,7 @@ static int SysErrorNoReport(const char* buffer)
 		if (MinidumpInitialized())
 #endif
 		{
+			FlushCrashLog();
 			return -1;
 		}
 	}
@@ -208,6 +230,9 @@ static int SysErrorNoReport(const char* buffer)
 #endif
 #endif
 
+#if !defined(IS_FXSERVER)
+	FlushCrashLog();
+#endif
 	TerminateProcess(GetCurrentProcess(), 1);
 #else
 	fprintf(stderr, "%s", buffer);
@@ -292,6 +317,14 @@ static int GlobalErrorHandler(int eType, const char* buffer, bool noReport = fal
 	std::string& lastFatalError = errorData->perProcess->lastFatalError;
 
 	trace("Error: %s\n", buffer);
+
+#if defined(_WIN32) && !defined(IS_FXSERVER)
+	{
+		std::string line = std::string(eType == ERR_FATAL ? "--- FATAL Error: " : "--- Error: ") + buffer + "\n";
+		SyncCriticalTrace(line.c_str());
+		FlushCrashLog();
+	}
+#endif
 
 	if (inError || (eType == ERR_FATAL && inFatalError))
 	{

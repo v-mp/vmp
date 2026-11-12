@@ -118,6 +118,7 @@ static void send_sentry_session(const json& data)
 std::string g_entitlementSource;
 
 bool LoadOwnershipTicket();
+static std::map<std::string, std::string> load_crashometry();
 
 static json g_session;
 
@@ -201,6 +202,15 @@ static void OnStartSession()
 		g_entitlementSource = "default";
 	}
 
+	std::string sessionDid = g_entitlementSource;
+	{
+		auto crashometry = load_crashometry();
+		if (crashometry.find("RockstarId") != crashometry.end() && !crashometry["RockstarId"].empty())
+		{
+			sessionDid = crashometry["RockstarId"];
+		}
+	}
+
 	FILE* f = _wfopen(MakeRelativeCitPath(L"citizen/release.txt").c_str(), L"r");
 	std::string version;
 
@@ -224,7 +234,7 @@ static void OnStartSession()
 
 	auto session = json::object({ 
 		{ "sid", sid },
-		{ "did", g_entitlementSource },
+		{ "did", sessionDid },
 		{ "init", true },
 		{ "attrs", json::object({
 			{ "release", version },
@@ -833,6 +843,100 @@ static LPTHREAD_START_ROUTINE GetFunc(HANDLE hProcess, const char* name)
 extern nlohmann::json SymbolicateCrash(HANDLE hProcess, HANDLE hThread, PEXCEPTION_RECORD er, PCONTEXT ctx);
 extern void ParseSymbolicCrash(nlohmann::json& crash, std::string* signature, std::string* stackTrace);
 
+static void CrashLogLine(const std::string& line)
+{
+	auto syncTrace = reinterpret_cast<void(*)(const char*)>(GetProcAddress(GetModuleHandleW(NULL), "SyncCriticalTrace"));
+
+	if (syncTrace)
+	{
+		syncTrace((line + "\n").c_str());
+	}
+	else
+	{
+		trace("%s\n", line);
+	}
+}
+
+static void WriteDetailedCrashReportToLog(DWORD exceptionCode, const std::wstring& dumpPath, const std::wstring& moduleHash,
+	const std::string& signature, const std::string& stackTrace, const std::string& exType, const std::string& exWhat,
+	const std::map<std::string, std::string>& crashometry)
+{
+	std::ostringstream report;
+	report << "--- CRASH REPORT BEGIN ---\n";
+	report << fmt::sprintf("exceptionCode=0x%08lX\n", exceptionCode);
+	report << fmt::sprintf("dumpPath=%s\n", ToNarrow(dumpPath));
+
+	if (!moduleHash.empty())
+	{
+		report << fmt::sprintf("crashHash=%s\n", ToNarrow(moduleHash));
+		report << fmt::sprintf("legacyHash=%s\n", ToNarrow(HashCrash(moduleHash)));
+		report << fmt::sprintf("signature=%s\n", ToNarrow(UnblameCrash(moduleHash)));
+	}
+
+	if (!signature.empty())
+	{
+		report << fmt::sprintf("symbolicSignature=%s\n", signature);
+	}
+
+	if (!exType.empty())
+	{
+		report << fmt::sprintf("exceptionType=%s\n", exType);
+	}
+
+	if (!exWhat.empty())
+	{
+		report << fmt::sprintf("exceptionWhat=%s\n", exWhat);
+	}
+
+	if (!stackTrace.empty())
+	{
+		report << "stackTrace:\n" << stackTrace;
+		if (stackTrace.back() != '\n')
+		{
+			report << "\n";
+		}
+	}
+
+	if (!crashometry.empty())
+	{
+		report << "crashometry:\n";
+		for (const auto& pair : crashometry)
+		{
+			report << fmt::sprintf("  %s=%s\n", pair.first, pair.second);
+		}
+	}
+
+	report << "--- CRASH REPORT END ---";
+
+	const std::string text = report.str();
+
+	for (size_t start = 0; start < text.size(); )
+	{
+		size_t end = text.find('\n', start);
+		if (end == std::string::npos)
+		{
+			CrashLogLine(text.substr(start));
+			break;
+		}
+
+		CrashLogLine(text.substr(start, end - start));
+		start = end + 1;
+	}
+
+	CreateDirectoryW(MakeRelativeCitPath(L"data\\cache").c_str(), nullptr);
+
+	if (FILE* f = _wfopen(MakeRelativeCitPath(L"data\\cache\\last_crash_report.txt").c_str(), L"wb"))
+	{
+		fwrite(text.data(), 1, text.size(), f);
+		fclose(f);
+	}
+
+	if (auto flush = reinterpret_cast<void(*)()>(GetProcAddress(GetModuleHandleW(NULL), "FlushCrashLog")))
+	{
+		flush();
+	}
+}
+
 static void PruneCrashDumps()
 {
 	auto crashDirectory = MakeRelativeCitPath(L"crashes");
@@ -917,6 +1021,9 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 
 	CrashGenerationServer::OnClientDumpRequestCallback dumpCallback = [] (void*, const ClientInfo* info, const std::wstring* filePath)
 	{
+		trace("--- DumpServer received crash dump request path=%s ---\n",
+			filePath ? ToNarrow(*filePath).c_str() : "(null)");
+
 		PruneCrashDumps();
 
 		// we're going to be reporting, make a new event
@@ -1064,6 +1171,10 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 													crashHash = moduleBaseString;
 													moduleFound = true;
 
+													CrashLogLine(fmt::sprintf("--- CRASH moduleHash=%s legacyHash=%s ---",
+														ToNarrow(crashHash),
+														ToNarrow(HashCrash(crashHash))));
+
 													break;
 												}
 											}
@@ -1136,6 +1247,10 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 														auto moduleBaseString = va(L"%s_unloaded+%X", filename, (uintptr_t)((char*)ex.ExceptionAddress - base));
 														crashHash = moduleBaseString;
 
+														CrashLogLine(fmt::sprintf("--- CRASH unloadedModuleHash=%s legacyHash=%s ---",
+															ToNarrow(crashHash),
+															ToNarrow(HashCrash(crashHash))));
+
 														break;
 													}
 												}
@@ -1159,6 +1274,13 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 
 								// store exception code
 								exceptionCode = ex.ExceptionCode;
+
+								CrashLogLine(fmt::sprintf("--- CRASH raw exceptionCode=0x%08lX addr=%p access=%u info0=%p info1=%p ---",
+									exceptionCode,
+									ex.ExceptionAddress,
+									static_cast<unsigned>(ex.NumberParameters > 0 ? ex.ExceptionInformation[0] : 0),
+									reinterpret_cast<void*>(ex.NumberParameters > 0 ? ex.ExceptionInformation[0] : 0),
+									reinterpret_cast<void*>(ex.NumberParameters > 1 ? ex.ExceptionInformation[1] : 0)));
 
 								// try parsing any C++ exception
 								if (ex.ExceptionCode == 0xE06D7363 && ex.ExceptionInformation[0] == 0x19930520)
@@ -1278,9 +1400,17 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 				}
 
 				parameters[L"BuildID"] = L"20170101";
-				parameters[L"UserID"] = ToWide(g_entitlementSource);
 
 				auto crashometry = load_crashometry();
+
+				std::string userId = g_entitlementSource;
+				if (crashometry.find("RockstarId") != crashometry.end() && !crashometry["RockstarId"].empty())
+				{
+					userId = crashometry["RockstarId"];
+					crashometry.erase("RockstarId");
+				}
+
+				parameters[L"UserID"] = ToWide(userId);
 
 				parameters[L"Product"] = PRODUCT_NAME;
 
@@ -1335,6 +1465,11 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 									files[L"upload_file_gamelog"] = ToWide(logPath);
 								}
 							}
+						}
+
+						if (gameProcess != parentProcess)
+						{
+							CloseHandle(gameProcess);
 						}
 					}
 				}
@@ -1490,6 +1625,8 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 					content += fmt::sprintf(gettext(L"\nStack trace:\n%s"), ToWide(stackTrace));
 				}
 
+				WriteDetailedCrashReportToLog(exceptionCode, *filePath, crashHash, csignature, stackTrace, exType, exWhat, crashometry);
+
 				if (isAccessDeath)
 				{
 					if (!g_accessDeathFriendlyMessage)
@@ -1568,6 +1705,11 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 									WaitForSingleObject(hThread, 7500);
 									CloseHandle(hThread);
 								}
+							}
+
+							if (gameProcess != parentProcess)
+							{
+								CloseHandle(gameProcess);
 							}
 						}
 
@@ -1812,6 +1954,20 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 
 	CrashGenerationServer::OnClientExitedCallback exitCallback = [] (void*, const ClientInfo* info)
 	{
+		DWORD exitCode = 0;
+		DWORD pid = 0;
+		HANDLE process = info ? info->process_handle() : nullptr;
+
+		if (process)
+		{
+			GetExitCodeProcess(process, &exitCode);
+			pid = GetProcessId(process);
+		}
+
+		trace("--- DumpServer client exited pid=%lu exitCode=0x%08lX dumps=%lu ---\n",
+			pid,
+			exitCode,
+			numCrashReports);
 	};
 
 	CrashGenerationServer::OnClientUploadRequestCallback uploadCallback = [] (void*, DWORD)
@@ -1833,6 +1989,18 @@ void InitializeDumpServer(int inheritedHandle, int parentPid)
 		}
 
 		WaitForSingleObject(parentProcess, INFINITE);
+
+		DWORD parentExitCode = 0;
+		GetExitCodeProcess(parentProcess, &parentExitCode);
+
+		if (numCrashReports == 0)
+		{
+			trace("--- DumpServer parent exited WITHOUT crash dump exitCode=0x%08lX (silent/clean exit or uncaught kill) ---\n", parentExitCode);
+		}
+		else
+		{
+			trace("--- DumpServer parent exited after %lu crash report(s) exitCode=0x%08lX ---\n", numCrashReports, parentExitCode);
+		}
 
 		if (numCrashReports > 0)
 		{

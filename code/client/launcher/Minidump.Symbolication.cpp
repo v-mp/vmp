@@ -75,6 +75,10 @@ void ParseSymbolicCrash(nlohmann::json& crash, std::string* signature, std::stri
 					{
 						appPath = relPath.substr(f + 6);
 					}
+					else if (auto f = relPath.find("vmp/"); f != std::string::npos)
+					{
+						appPath = relPath.substr(f + 4);
+					}
 
 					auto fn = relPath.substr(relPath.find_last_of('/') + 1);
 					

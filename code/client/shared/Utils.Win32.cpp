@@ -241,6 +241,8 @@ void SetThreadName(int dwThreadID, const char* threadName)
 
 void AddCrashometry(const std::string& key, const std::string& value)
 {
+	CreateDirectoryW(MakeRelativeCitPath(L"data\\cache").c_str(), nullptr);
+
 	FILE* f = _wfopen(MakeRelativeCitPath(L"data\\cache\\crashometry").c_str(), L"ab");
 
 	if (f)
@@ -254,6 +256,7 @@ void AddCrashometry(const std::string& key, const std::string& value)
 		fwrite(key.c_str(), 1, key.size(), f);
 		fwrite(value.c_str(), 1, value.size(), f);
 
+		fflush(f);
 		fclose(f);
 	}
 }

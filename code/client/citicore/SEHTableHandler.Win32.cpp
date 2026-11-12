@@ -11,8 +11,135 @@
 #include "Hooking.Aux.h"
 
 #include <Error.h>
+#include <Utils.h>
 
 #include <udis86.h>
+
+#ifndef IS_FXSERVER
+static void LogUnhandledException(EXCEPTION_POINTERS* ptrs, const char* tag)
+{
+	if (!ptrs || !ptrs->ExceptionRecord)
+	{
+		return;
+	}
+
+	char modulePath[MAX_PATH] = { "unknown" };
+	HMODULE mod = nullptr;
+	DWORD flags = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
+
+	if (GetModuleHandleExA(flags, reinterpret_cast<LPCSTR>(ptrs->ExceptionRecord->ExceptionAddress), &mod) && mod)
+	{
+		GetModuleFileNameA(mod, modulePath, std::size(modulePath));
+	}
+
+	const char* baseName = modulePath;
+	if (auto slash = strrchr(modulePath, '\\'))
+	{
+		baseName = slash + 1;
+	}
+
+	uintptr_t rip = 0;
+	if (ptrs->ContextRecord)
+	{
+#ifdef _M_AMD64
+		rip = static_cast<uintptr_t>(ptrs->ContextRecord->Rip);
+#else
+		rip = static_cast<uintptr_t>(ptrs->ContextRecord->Eip);
+#endif
+	}
+
+	char line[768];
+	_snprintf_s(line, _TRUNCATE,
+		"--- CRASH %s code=0x%08lX addr=%p rip=%p module=%s tid=%lu ---\n",
+		tag,
+		ptrs->ExceptionRecord->ExceptionCode,
+		ptrs->ExceptionRecord->ExceptionAddress,
+		reinterpret_cast<void*>(rip),
+		baseName,
+		GetCurrentThreadId());
+
+	SyncCriticalTrace(line);
+	FlushCrashLog();
+}
+
+static void LogLocalStackTrace(const char* tag)
+{
+	void* frames[32] = {};
+	USHORT captured = CaptureStackBackTrace(2, static_cast<DWORD>(std::size(frames)), frames, nullptr);
+
+	char line[768];
+	_snprintf_s(line, _TRUNCATE, "--- STACK %s frames=%u ---\n", tag, captured);
+	SyncCriticalTrace(line);
+
+	for (USHORT i = 0; i < captured; ++i)
+	{
+		HMODULE mod = nullptr;
+		char modulePath[MAX_PATH] = { "unknown" };
+		DWORD flags = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
+
+		if (GetModuleHandleExA(flags, reinterpret_cast<LPCSTR>(frames[i]), &mod) && mod)
+		{
+			GetModuleFileNameA(mod, modulePath, std::size(modulePath));
+		}
+
+		const char* baseName = modulePath;
+		if (auto slash = strrchr(modulePath, '\\'))
+		{
+			baseName = slash + 1;
+		}
+
+		uintptr_t offset = 0;
+		if (mod)
+		{
+			offset = reinterpret_cast<uintptr_t>(frames[i]) - reinterpret_cast<uintptr_t>(mod);
+		}
+
+		_snprintf_s(line, _TRUNCATE, "  #%02u %s+%X (%p)\n", i, baseName, static_cast<unsigned>(offset), frames[i]);
+		SyncCriticalTrace(line);
+	}
+}
+
+static BOOL (WINAPI* g_origTerminateProcess)(HANDLE, UINT);
+static BOOL WINAPI TerminateProcessHook(HANDLE hProcess, UINT uExitCode)
+{
+	DWORD pid = 0;
+
+	if (hProcess == GetCurrentProcess() || hProcess == (HANDLE)-1)
+	{
+		pid = GetCurrentProcessId();
+	}
+	else
+	{
+		pid = GetProcessId(hProcess);
+	}
+
+	if (pid == GetCurrentProcessId())
+	{
+		char line[256];
+		_snprintf_s(line, _TRUNCATE, "--- PROCESS TerminateProcess exitCode=0x%08X tid=%lu ---\n", uExitCode, GetCurrentThreadId());
+		SyncCriticalTrace(line);
+
+		if (uExitCode != 0)
+		{
+			LogLocalStackTrace("TerminateProcess");
+		}
+
+		FlushCrashLog();
+	}
+
+	return g_origTerminateProcess(hProcess, uExitCode);
+}
+
+static void (WINAPI* g_origExitProcess)(UINT);
+static void WINAPI ExitProcessHook(UINT uExitCode)
+{
+	char line[256];
+	_snprintf_s(line, _TRUNCATE, "--- PROCESS ExitProcess exitCode=0x%08X tid=%lu ---\n", uExitCode, GetCurrentThreadId());
+	SyncCriticalTrace(line);
+	FlushCrashLog();
+	g_origExitProcess(uExitCode);
+}
+#endif
 
 static void* FindCallFromAddress(void* methodPtr, ud_mnemonic_code mnemonic = UD_Icall, bool breakOnFirst = false)
 {
@@ -400,6 +527,10 @@ static BOOLEAN WINAPI RtlDispatchExceptionStub(EXCEPTION_RECORD* record, CONTEXT
 			ptrs.ContextRecord = context;
 			ptrs.ExceptionRecord = record;
 
+#ifndef IS_FXSERVER
+			LogUnhandledException(&ptrs, "RtlDispatchException");
+#endif
+
 			if (g_exceptionHandler)
 			{
 				g_exceptionHandler(&ptrs);
@@ -430,6 +561,10 @@ static NTSTATUS NTAPI RtlReportExceptionStub(PEXCEPTION_RECORD ExceptionRecord, 
 		ptrs.ContextRecord = ContextRecord;
 		ptrs.ExceptionRecord = ExceptionRecord;
 
+#ifndef IS_FXSERVER
+		LogUnhandledException(&ptrs, "RtlReportException");
+#endif
+
 		if (g_exceptionHandler)
 		{
 			g_exceptionHandler(&ptrs);
@@ -453,8 +588,17 @@ static void terminateStub()
 		ptrs.ExceptionRecord = exc;
 		ptrs.ContextRecord = reinterpret_cast<PCONTEXT>(FlsGetValue(g_lastExc1Index));
 
+#ifndef IS_FXSERVER
+		LogUnhandledException(&ptrs, "UCRT_terminate_cpp");
+#endif
+
 		_TerminateForException(&ptrs);
 	}
+
+#ifndef IS_FXSERVER
+	SyncCriticalTrace("--- CRASH UCRT terminate() called (no C++ exception record) ---\n");
+	FlushCrashLog();
+#endif
 
 	FatalError("UCRT terminate() called");
 }
@@ -476,6 +620,10 @@ extern "C" void DLL_EXPORT CoreSetExceptionOverride(LONG (*handler)(EXCEPTION_PO
 			MH_CreateHook(internalAddress, RtlDispatchExceptionStub, (void**)&g_origRtlDispatchException);
 			MH_CreateHook(GetProcAddress(GetModuleHandle(L"ucrtbase.dll"), "terminate"), terminateStub, NULL);
 			MH_CreateHookApi(L"ntdll.dll", "RtlReportException", RtlReportExceptionStub, (void**)&g_origRtlReportException);
+#ifndef IS_FXSERVER
+			MH_CreateHookApi(L"kernel32.dll", "TerminateProcess", TerminateProcessHook, (void**)&g_origTerminateProcess);
+			MH_CreateHookApi(L"kernel32.dll", "ExitProcess", ExitProcessHook, (void**)&g_origExitProcess);
+#endif
 			MH_EnableHook(MH_ALL_HOOKS);
 		}
 	}

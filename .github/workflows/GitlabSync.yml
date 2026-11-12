@@ -6,6 +6,8 @@ on:
 
 jobs:
   sync:
+    # Forks (e.g. rootiens/vmp) do not have TARGET_* secrets; skip instead of failing every push.
+    if: ${{ github.repository == 'v-mp/vmp' && github.actor != 'AhmadZare' }}
     runs-on: ubuntu-latest
     name: Git Repo Sync
     steps:
@@ -13,7 +15,6 @@ jobs:
         with:
           fetch-depth: 0
       - name: Sync Repository
-        if: ${{ github.actor != 'AhmadZare' }}
         uses: wangchucheng/git-repo-sync@v0.1.0
         with:
           target-url: ${{ secrets.TARGET_URL }}
